@@ -1,0 +1,59 @@
+<!--<vector xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:height="140dp"-->
+<!--    android:width="400dp"-->
+<!--    android:viewportWidth="400"-->
+<!--    android:viewportHeight="140">-->
+
+
+
+
+<!--&lt;!&ndash;    Boat&ndash;&gt;-->
+<!--      <path-->
+<!--          android:name="vect"-->
+<!--          android:strokeColor="#AAAAAA"-->
+<!--          android:strokeWidth="5"-->
+<!--          android:fillColor="#DDCCCCCC"-->
+<!--          android:pathData="M0,70c130,-70 235,-70 400,-50-->
+<!--            M0,70c130,70 235,70 400,50-->
+<!--            v-100"-->
+<!--          />-->
+
+
+<!--</vector>-->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+android:height="105dp"
+android:width="300dp"
+android:viewportWidth="100"
+android:viewportHeight="35">
+
+<!-- Boat -->
+<path
+    android:name="vect"
+    android:strokeColor="#AAAAAA"
+    android:strokeLineJoin="bevel"
+    android:strokeWidth="4"
+    android:pathData="M0,17.5c32.5,-17.5 58.75,-17.5 96,-12.5
+            M0,17.5c32.5,17.5 58.75,17.5 96,12.5
+            v-26"
+
+    />
+    <!--    Mast-->
+       <path
+           android:strokeColor="#FFAAAAAA"
+           android:fillColor="#FFAAAAAA"
+           android:strokeWidth="4"
+           android:pathData="M28,18.5
+            a1,1 0 0,0 6,0
+            M28,18.5
+             a1,1 0 0,0.25 6,0" />
+    <!--    Sail-->
+       <path
+           android:strokeColor="#FFAAAAAA"
+           android:strokeWidth="4"
+           android:pathData="M32.5,18.5c20,10 40,10, 60,7.5" />
+
+</vector>
+
+
+

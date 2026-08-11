@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_margin">16dp</dimen>
+
+    <!--    Numeric Keyboard-->
+    <dimen name="numeric_title_text_size">25sp</dimen>
+    <dimen name="numeric_result_text_size">20sp</dimen>
+    <dimen name="numeric_key_height">80dp</dimen>
+    <dimen name="numeric_key_width">80dp</dimen>
+    <dimen name="numeric_key_text_size">25sp</dimen>
+    <dimen name="numeric_key_margin_size">0dp</dimen>
+</resources>

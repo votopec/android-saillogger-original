@@ -1,0 +1,73 @@
+<!--<vector xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:height="800dp"-->
+<!--    android:width="200dp"-->
+<!--    android:viewportWidth="200"-->
+<!--    android:viewportHeight="800">-->
+
+<!--&lt;!&ndash;    Boat&ndash;&gt;-->
+<!--      <path-->
+<!--          android:name="vect"-->
+<!--          android:strokeColor="#AAAAAA"-->
+<!--          android:strokeWidth="5"-->
+<!--          android:fillColor="#AACCCCCC"-->
+<!--          android:pathData="M0,700h200l-15,40l-15,15l-60,15l-20,0l-60,-15l-15,-15z"-->
+<!--          />-->
+<!--    &lt;!&ndash;    Bow line&ndash;&gt;-->
+<!--    <path-->
+<!--        android:name="vect2"-->
+<!--        android:strokeColor="#AAAAAA"-->
+<!--        android:strokeWidth="8"-->
+<!--        android:pathData="M100,700v70"-->
+<!--        />-->
+<!--&lt;!&ndash;    Mast&ndash;&gt;-->
+<!--   <path-->
+<!--       android:strokeColor="#CCCCCC"-->
+<!--       android:strokeWidth="10"-->
+<!--       android:pathData="M0,700m98,0v-700" />-->
+
+<!--    &lt;!&ndash;    Shrouds&ndash;&gt;-->
+<!--    <path-->
+<!--        android:strokeColor="#CCCCCC"-->
+<!--        android:strokeWidth="7"-->
+<!--        android:pathData="M100,0l60,400,v300m0,-300h-120M100,0l-60,400,v300" />-->
+
+<!--</vector>-->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+android:height="200dp"
+android:width="50dp"
+android:viewportWidth="50"
+android:viewportHeight="200">
+
+
+
+<!-- Boat -->
+<path
+    android:name="vect"
+    android:strokeColor="#FF000000"
+    android:strokeWidth="4"
+    android:pathData="M0,175h50l-3.75,10l-3.75,3.75l-15,3.75l-5,0l-15,-3.75l-3.75,-3.75z"
+    />
+
+<!-- Bow line -->
+<path
+    android:name="vect2"
+    android:strokeColor="#FF000000"
+    android:strokeWidth="3"
+    android:pathData="M25,175v17.5"
+    />
+
+<!-- Mast -->
+<path
+    android:strokeColor="#000000"
+    android:strokeWidth="4"
+    android:pathData="M25,175v-175"
+    />
+
+<!-- Shrouds -->
+<path
+    android:strokeColor="#000000"
+    android:strokeWidth="3"
+    android:pathData="M25,0l15,100,v75m0,-75h-30M25,0l-15,100,v75" />
+</vector>
+

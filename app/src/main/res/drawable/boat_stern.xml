@@ -1,0 +1,54 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="200dp"
+    android:width="50dp"
+    android:viewportWidth="50"
+    android:viewportHeight="200">
+
+<!--    Boat-->
+      <path
+          android:name="vect"
+          android:strokeColor="@color/black"
+          android:strokeWidth="4"
+          android:fillColor="#80CCCCCC"
+          android:pathData="M0,175h10l5,12.5h20l5,-12.5h10l-3.75,10l-3.75,3.75l-15,3.75l-5,0l-15,-3.75l-3.75,-3.75z"
+          />
+<!--    android:pathData="M0,700h40l20,50h80l20,-50h40l-15,40l-15,15l-60,15l-20,0l-60,-15l-15,-15z"-->
+
+    <!--    Boat inside-->
+    <path
+        android:name="vect2"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="4"
+        android:pathData="M0,175m10,0l5,12.5h20l5,-12.5h-30"
+
+/>
+<!--        android:pathData="M0,700m40,0l20,50h80l20,-50h-120"-->
+<!--        />-->
+<!--    Mast-->
+   <path
+       android:fillColor="#CCCCCC"
+       android:strokeColor="@color/black"
+       android:strokeWidth="4"
+       android:pathData="M0,175m25,0v-175"/>
+<!--       android:pathData="M0,700m100,0v-700" />-->
+
+    <!--    Shrouds-->
+    <path
+        android:strokeColor="@color/black"
+        android:strokeWidth="2"
+        android:pathData="M25,0l15,100,v75m0,-75h-30M25,0l-15,100,v75"
+        />
+<!--        android:pathData="M100,0l60,400,v300m0,-300h-120M100,0l-60,400,v300"-->
+<!--        />-->
+
+    <!--    Foil-->
+    <path
+        android:strokeColor="@color/black"
+        android:strokeWidth="4"
+        android:pathData="M25,181.25v20h1.25v-20"
+
+        />
+<!--        android:pathData="M100,725v80h5v-80"-->
+<!--        />-->
+
+</vector>

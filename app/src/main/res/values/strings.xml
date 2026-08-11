@@ -1,0 +1,59 @@
+<resources>
+    <string name="app_name">SailLogger</string>
+    <string name="csv_fields">Timestamp,Longitude,Latitude,SOG,COG</string>
+    <string name="bow">bow</string>
+    <string name="stern">stern</string>
+    <string name="stbd">stbd</string>
+    <string name="port">port</string>
+    <string name="down">down</string>
+    <string name="up">up</string>
+    <string name="no_gps_location">No GPS location</string>
+    <string name="location_rationale">Sail Logger collects location data to enable track logging even when the app is closed or not in use. This app logs your sailing session. It requires background location data to be logged. This is considered to be sensitive information and needs user approval. Data collected is exclusively written to the app folder on the device and cannot be accessed by authors or any third party. In next screen you will be asked to allow these permissions. Select \'Allow all the time\' to be able to use the app properly.</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="heel">Heel</string>
+    <string name="pitch">Pitch</string>
+
+    <string name="no_gps_signal">No GPS</string>
+    <string name="gps_signal_excellent">GPS excellent</string>
+    <string name="gps_signal_medium">GPS medium</string>
+    <string name="gps_not_allowed">GPS not Allowed</string>
+    <string name="backgrnd_gps_not_allowed">Background GPS\n not Allowed\n by user!</string>
+    <string name="in_plus_number">In: %d</string>
+    <string name="gps_allowed">GPS Allowed</string>
+    <string name="boat">Boat: %d</string>
+    <string name="freq">Freq: %d/s</string>
+    <string name="team">Team: %s</string>
+    <string name="version">Ver: %s</string>
+    <string name="pitch_with_number">Pitch: %s</string>
+    <string name="heel_with_number">Heel: %s</string>
+    <string name="num_plus_s">%d/s</string>
+    <string name="heading">Heading</string>
+    <string name="altitude">Altitude</string>
+    <string name="magnet">Magnet</string>
+    <string name="log_title">Log:</string>
+    <string name="reset_zeroing">Reset Zeroing</string>
+    <string name="mark_now">Mark Now</string>
+    <string name="rotate">Rotate</string>
+    <string name="settings">Settings</string>
+    <string name="_1_s">1/S</string>
+    <string name="_1">1</string>
+    <string name="unkn">UNKN</string>
+    <string name="log">Log</string>
+
+    <plurals name="scan_qr_title">
+        <item quantity="one">Scan this code from SailViewer Menu/Events/Read QR</item>
+        <item quantity="other">Scan these %d codes from SailViewer Menu/Events/Read QR</item>
+    </plurals>
+</resources>

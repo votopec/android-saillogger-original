@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/constraint_layout_non_logging"
+        tools:context="com.ibsailing.saillogger.MainActivity">
+
+    <TextView
+
+        android:text="@string/no_gps_signal"
+        style="@style/gps_textviews"
+        android:id="@+id/status_textview"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+
+    <!--Boat ImageView-->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/boat_top"
+        android:id="@+id/boat_image_view"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        />
+
+
+    <!--    Version TextView-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/versionTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!--Top And Bottom Text Views For Rotation-->
+    <TextView
+
+        android:text="top"
+        style="@style/top_bottom_text_views"
+        android:id="@+id/topTextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        style="@style/top_bottom_text_views"
+
+        android:text="bottom"
+        android:id="@+id/bottomTextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <TextView
+        style="@style/top_bottom_text_views"
+        android:text="port"
+        android:id="@+id/leftTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        style="@style/top_bottom_text_views"
+        android:text="stbd"
+        android:id="@+id/rightTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <!--    Share-->
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share"
+        android:id="@+id/button_share"
+        app:layout_constraintTop_toTopOf="@id/topTextView"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+
+
+    <!--   Heel-->
+    <TextView
+        style="@style/ptch_heel_az_titles"
+        android:text="Heel"
+        android:id="@+id/heel_title"
+        app:layout_constraintTop_toBottomOf="@id/button_share"
+        app:layout_constraintRight_toLeftOf="@id/guidelineFirstThird"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/heel_textview"
+        android:textAlignment="viewEnd"
+        android:text="0.0"
+        app:layout_constraintTop_toBottomOf="@id/heel_title"
+        app:layout_constraintRight_toLeftOf="@id/guidelineFirstThird"
+        style="@style/ptc_heel_az_textviews"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zero"
+        android:id="@+id/zero_heel_button"
+        android:layout_marginBottom="20sp"
+        app:layout_constraintTop_toBottomOf="@id/heel_textview"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@id/guidelineFirstThird"
+
+
+        />
+    <!--  Pitch-->
+
+
+
+    <TextView
+        style="@style/ptch_heel_az_titles"
+        android:text="Pitch"
+        android:id="@+id/pitch_title"
+        app:layout_constraintBottom_toBottomOf="@id/heel_title"
+        app:layout_constraintRight_toLeftOf="@id/guidelineSecondThird"
+        app:layout_constraintLeft_toLeftOf="@id/guidelineFirstThird"
+        />
+    <TextView
+        android:id="@+id/pitch_textview"
+        app:layout_constraintBottom_toBottomOf="@id/heel_textview"
+        android:text="0.0"
+        app:layout_constraintRight_toRightOf="@id/guidelineSecondThird"
+        style="@style/ptc_heel_az_textviews"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zero"
+        android:id="@+id/button_zero_pitch"
+        app:layout_constraintBottom_toBottomOf="@id/zero_heel_button"
+        app:layout_constraintRight_toRightOf="@id/guidelineSecondThird"
+        app:layout_constraintLeft_toLeftOf="@id/guidelineFirstThird"
+        />
+    <!--  Azimuth-->
+    <TextView
+        style="@style/ptch_heel_az_titles"
+        android:text="Hdg"
+        android:id="@+id/heading_title"
+        app:layout_constraintBottom_toBottomOf="@id/heel_title"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/guidelineSecondThird"
+        />
+    <TextView
+        android:id="@+id/heading_textview"
+        android:text="0.0"
+        app:layout_constraintBottom_toBottomOf="@id/heel_textview"
+        app:layout_constraintRight_toRightOf="parent"
+        style="@style/ptc_heel_az_textviews" />
+<!--GPS Time-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/gps_time_textview"
+        android:text="0:00:00UTC"
+        app:layout_constraintBottom_toBottomOf="@id/zero_heel_button"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMiddle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineFirstThird"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineSecondThird"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66" />
+
+
+
+
+
+
+<!--Log-->
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/log"
+        android:textSize="50sp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/button_start_logging"
+        app:layout_constraintTop_toBottomOf="@id/zero_heel_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+
+
+    <!--  Start Line Data-->
+
+    <TextView
+
+        style="@style/top_bottom_text_views"
+        android:id="@+id/start_line_text_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/team_text_view"
+        />
+
+    <!--Team Name-->
+    <TextView
+        style="@style/big_colored_letters"
+        android:text="@string/unkn"
+        android:id="@+id/team_text_view"
+        app:layout_constraintBottom_toTopOf="@id/non_logging_mark_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/boat_no_text_view"
+   />
+
+
+    <!--Boat Number-->
+    <TextView
+        style="@style/big_colored_letters"
+        android:text="@string/_1"
+        android:id="@+id/boat_no_text_view"
+        app:layout_constraintBottom_toBottomOf="@id/team_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/team_text_view"
+        />
+
+    <!--    Frequency-->
+    <TextView
+        style="@style/logging_data_textviews"
+        android:text="@string/_1_s"
+        android:id="@+id/frequency_text_view"
+        app:layout_constraintBottom_toTopOf="@id/settings_button"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <!--    Settings-->
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings"
+        android:id="@+id/settings_button"
+        app:layout_constraintBottom_toTopOf="@id/bottomTextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+
+    <!--  Rotate-->
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/rotate"
+        android:id="@+id/button_rotate"
+        app:layout_constraintBottom_toTopOf="@id/bottomTextView"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mark_now"
+        android:id="@+id/non_logging_mark_button"
+        app:layout_constraintBottom_toBottomOf="@id/frequency_text_view"
+        app:layout_constraintStart_toStartOf="@id/guidelineFirstThird"
+        app:layout_constraintEnd_toEndOf="@id/guidelineSecondThird"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

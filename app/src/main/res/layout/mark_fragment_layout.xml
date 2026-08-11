@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ibsailing.saillogger.MainActivity">
+
+    <Button
+        android:id="@+id/portStartButton"
+        style="@style/mark_buttons"
+        android:text="Port (Pin)"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <Button
+        android:id="@+id/stbdStartButton"
+        android:text="STBD (RC)"
+        style="@style/mark_buttons"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <Button
+        android:id="@+id/startTimeButton"
+        android:text="Start Time"
+        style="@style/mark_buttons"
+        app:layout_constraintTop_toBottomOf="@id/stbdStartButton"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+    <Button
+        style="@style/mark_buttons"
+        android:text="Text Event"
+        android:id="@+id/event_text_button"
+        app:layout_constraintTop_toBottomOf="@id/startTimeButton"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Event Text"
+        android:id="@+id/event_text_edit_text"
+        app:layout_constraintTop_toBottomOf="@id/event_text_button"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <TextView
+        android:layout_marginTop="20dp"
+        style="@style/top_bottom_text_views"
+        app:layout_constraintTop_toBottomOf="@id/event_text_edit_text"
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/start_line_info_text_view"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

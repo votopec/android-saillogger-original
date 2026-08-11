@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+      >
+<androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/numeric_title_text_size"
+        android:text="Input Number"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/titleTextView"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        app:layout_constraintEnd_toEndOf="@id/numbersTableLayout"
+        android:gravity="end"
+        android:textColor="@color/black"
+        android:textSize="@dimen/numeric_result_text_size"
+        android:id="@+id/inputNumberTextView"/>
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/inputNumberTextView"
+            app:layout_constraintStart_toStartOf="parent"
+               android:id="@+id/numbersTableLayout">
+
+            <TableRow>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="1"
+                    android:id="@+id/button_1"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="2"
+                    android:id="@+id/button_2"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="3"
+                    android:id="@+id/button_3"/>
+                </TableRow>
+            <TableRow>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+
+                    android:text="4"
+                    android:id="@+id/button_4"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+
+                    android:text="5"
+                    android:id="@+id/button_5"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+
+                    android:text="6"
+                    android:id="@+id/button_6"/>
+            </TableRow>
+            <TableRow>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="7"
+                    android:id="@+id/button_7"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="8"
+                    android:id="@+id/button_8"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="9"
+                    android:id="@+id/button_9"/>
+            </TableRow>
+            <TableRow>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="-"
+                    android:id="@+id/button_minus"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="0"
+                    android:id="@+id/button_0"/>
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/numeric_keyboard_buttons"
+                    android:text="."
+                    android:id="@+id/button_numeric_decimal"/>
+
+            </TableRow>
+        </TableLayout>
+    <androidx.appcompat.widget.AppCompatImageButton
+        style="@style/numeric_keyboard_buttons"
+        android:src="@drawable/baseline_backspace_24"
+        app:layout_constraintTop_toTopOf="@id/numbersTableLayout"
+        app:layout_constraintStart_toEndOf="@id/numbersTableLayout"
+        android:id="@+id/button_numeric_delete"/>
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/numeric_keyboard_buttons"
+        android:text="CLR"
+        app:layout_constraintTop_toBottomOf="@id/button_numeric_delete"
+        app:layout_constraintStart_toEndOf="@id/numbersTableLayout"
+        android:id="@+id/button_numeric_clear"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

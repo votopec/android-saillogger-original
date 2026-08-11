@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/constraint_layout_logging"
+    tools:context="com.ibsailing.saillogger.MainActivity">
+
+
+  <!--Boat ImageView-->
+  <ImageView
+      android:layout_width="300dp"
+      android:layout_height="300dp"
+      android:padding="20dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+      android:src="@drawable/boat_top"
+      android:id="@+id/boat_image_view"
+      android:scaleType="fitCenter"
+      android:adjustViewBounds="true"
+      />
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+    android:id="@+id/team_name_text_view"
+    style="@style/big_colored_letters"
+      android:padding="10dp"
+      android:text="Team"
+    app:layout_constraintTop_toBottomOf="@id/logging_active_text_view"
+    app:layout_constraintStart_toStartOf="parent"/>
+
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/boat_no_text_view"
+      style="@style/big_colored_letters"
+      android:text="1"
+      android:padding="10dp"
+
+      app:layout_constraintTop_toBottomOf="@id/logging_active_text_view"
+      app:layout_constraintEnd_toEndOf="parent"/>
+
+<!--  Stop Button-->
+  <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/logging_stop_button"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      android:text="Stop"
+      android:enabled="false"
+      />
+<!--  Unlock Button-->
+  <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/logging_unlock_button"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:text="Unlock"
+      />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMiddleLogging"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineFirstThirdLogging"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineSecondThirdLogging"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.75" />
+
+
+  <TextView
+      style="@style/logging_data_textviews"
+      android:id="@+id/gpsTextView"
+      app:layout_constraintTop_toBottomOf="@id/logging_stop_button"
+      app:layout_constraintLeft_toLeftOf="parent" />
+
+
+<!--  Start Line Data-->
+
+  <TextView
+      style="@style/top_bottom_text_views"
+      android:id="@+id/start_line_text_view"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintBottom_toTopOf="@id/sog_number_text_view"
+      />
+
+  <!--  SOG-->
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="SOG: "
+      android:id="@+id/sog_title_text_view"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintBottom_toBottomOf="@id/sog_number_text_view"
+      android:textSize="20sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sog_number_text_view"
+        android:textSize="40sp"
+        android:text="0.0"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnSurface"
+        app:layout_constraintBottom_toTopOf="@id/logging_mark_button"
+        app:layout_constraintStart_toEndOf="@id/sog_title_text_view"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text=" kts"
+        android:id="@+id/knots_textview"
+        app:layout_constraintBottom_toBottomOf="@id/sog_number_text_view"
+        app:layout_constraintStart_toEndOf="@id/sog_number_text_view"/>
+
+<!--Logging Active-->
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/logging_active_text_view"
+      app:layout_constraintBottom_toTopOf="@id/boat_image_view"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:textSize="40sp"
+      android:padding="5dp"
+      android:text="Logging Active"/>
+
+
+
+
+  <!--Mark Now Button-->
+  <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Mark Now"
+      android:textSize="30sp"
+      android:id="@+id/logging_mark_button"
+      app:layout_constraintBottom_toTopOf="@id/log_data_table_layout"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      />
+
+  <TableLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:id="@+id/log_data_table_layout"
+      app:layout_constraintBottom_toTopOf="@id/bottomTextView"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      >
+
+    <TableRow>
+      <!--   Time-->
+
+      <TextView
+          style="@style/logging_data_textviews"
+          android:text="Time:"
+          android:id="@+id/logged_time_title"
+          />
+      <TextView
+          style="@style/logging_data_textviews_values"
+          android:text="00:00:00"
+          android:id="@+id/logged_time_textview"
+          />
+      <!--    Max Speed -->
+      <TextView
+          android:text="Max Spd:"
+          android:id="@+id/max_speed_title"
+          style="@style/logging_data_textviews" />
+      <TextView
+          style="@style/logging_data_textviews_values"
+          android:text="0"
+          android:id="@+id/max_speed_textview"
+          />
+      <TextView
+          android:text="Heel:"
+          style="@style/logging_data_textviews" />
+      <TextView
+          android:id="@+id/heel_textview_logging"
+          android:textAlignment="viewEnd"
+          style="@style/logging_data_textviews_values"
+          android:text="0"
+          />
+
+
+    </TableRow>
+    <TableRow>
+      <!--   Logged Points-->
+      <TextView
+          style="@style/logging_data_textviews"
+          android:text="Pts:"
+          android:id="@+id/logged_points_title"
+
+          />
+      <TextView
+          style="@style/logging_data_textviews_values"
+          android:text="0"
+          android:id="@+id/logged_points_textview"
+          />
+
+    <!--    Events -->
+    <TextView
+        android:text="Events:"
+        android:id="@+id/events_title"
+        style="@style/logging_data_textviews" />
+    <TextView
+        style="@style/logging_data_textviews_values"
+        android:text="0"
+        android:id="@+id/events_number_text_view"
+        />
+      <!--  Pitch-->
+      <TextView
+          android:text="Pitch:"
+          style="@style/logging_data_textviews" />
+      <TextView
+          android:id="@+id/pitch_textview_logging"
+          style="@style/logging_data_textviews_values"
+          android:text="0.0"
+          android:textAlignment="viewEnd"
+          />
+
+    </TableRow>
+<TableRow>
+  <!--    Logged Locations-->
+  <TextView
+      android:text="Locs:"
+      android:id="@+id/logged_locations_title"
+      style="@style/logging_data_textviews" />
+  <TextView
+      style="@style/logging_data_textviews_values"
+      android:text="0"
+      android:id="@+id/logged_locations_textview"
+      />
+  <!--  Cog  -->
+  <TextView
+      android:text="Cog:"
+      style="@style/logging_data_textviews" />
+  <TextView
+      android:id="@+id/cog_textview_logging"
+      android:text="0.0"
+      android:textAlignment="viewEnd"
+      style="@style/logging_data_textviews_values"
+      />
+  <!--  Heading-->
+  <TextView
+      android:text="Hdg:"
+      style="@style/logging_data_textviews" />
+  <TextView
+      android:id="@+id/heading_textview_logging"
+      android:text="0.0"
+      style="@style/logging_data_textviews_values"
+      android:textAlignment="viewEnd"
+
+      />
+
+</TableRow>
+  </TableLayout>
+
+
+
+
+
+
+
+
+    <!--Top And Bottom Text Views For Rotation-->
+    <TextView
+        android:text="Top"
+        style="@style/top_bottom_text_views"
+        android:id="@+id/topTextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        style="@style/top_bottom_text_views"
+
+        android:text="bottom"
+        android:id="@+id/bottomTextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <TextView
+       style="@style/top_bottom_text_views"
+        android:text="left"
+        android:id="@+id/leftTextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+    <TextView
+        style="@style/top_bottom_text_views"
+
+        android:text="right"
+        android:id="@+id/rightTextView"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+  <!--GPS Time-->
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/logging_gps_time_textview"
+      android:text="0:00:00UTC"
+      app:layout_constraintTop_toBottomOf="@id/logging_unlock_button"
+      app:layout_constraintRight_toRightOf="parent"
+      />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
