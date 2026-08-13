@@ -23,6 +23,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.ibsailing.saillogger.databinding.ActivityMainBinding
@@ -49,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        applySystemBarInsets()
         //ViewModel
         viewModel = ViewModelProvider(this)[ViewModelMain::class.java]
 
@@ -94,6 +98,26 @@ class MainActivity : AppCompatActivity() {
         recoverInterruptedLogs()
         checkBattery()
 
+    }
+
+    private fun applySystemBarInsets() {
+        val root = binding.root
+        val initialLeft = root.paddingLeft
+        val initialTop = root.paddingTop
+        val initialRight = root.paddingRight
+        val initialBottom = root.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(
+                left = initialLeft + bars.left,
+                top = initialTop + bars.top,
+                right = initialRight + bars.right,
+                bottom = initialBottom + bars.bottom
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(root)
     }
 
     override fun onDestroy() {

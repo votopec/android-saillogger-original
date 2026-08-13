@@ -275,14 +275,19 @@ private var locationsAcquired=0
                                 ZoneOffset.UTC))
                         val durationString = date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                         binding.maxSpeedTextview.text =((mService?.maxSpeed?: (0F))* 1.94384).format(2)
-                        mService?.let { binding.heelTextviewLogging.visibleIf(it.isLoggingHeel) }
-                        mService?.let { binding.pitchTextviewLogging.visibleIf(it.isLoggingPitch) }
-                        mService?.let { binding.headingTextviewLogging.visibleIf(it.isLoggingHeading) }
-
-
-
-                        logPoint.heel?.let{binding.heelTextviewLogging.text=it.format(1)}
-                        logPoint.pitch?.let{binding.pitchTextviewLogging.text=it.format(1)}
+                        service?.let {
+                            binding.heelTextviewLogging.text = when {
+                                !it.isLoggingHeel -> "Off"
+                                it.lastSensorTime == 0L -> "--"
+                                else -> it.heel.format(1)
+                            }
+                            binding.pitchTextviewLogging.text = when {
+                                !it.isLoggingPitch -> "Off"
+                                it.lastSensorTime == 0L -> "--"
+                                else -> it.pitch.format(1)
+                            }
+                            binding.headingTextviewLogging.visibleIf(it.isLoggingHeading)
+                        }
                         binding.headingTextviewLogging.text="${viewModel.heading.roundToInt()}"
 
                         binding.loggedPointsTextview.text="$totalLoggedPoints"
