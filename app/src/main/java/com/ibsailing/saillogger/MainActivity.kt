@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startApp() {
         Log.d(TAG, "Startapp")
+        recoverInterruptedLogs()
         checkBattery()
 
     }
@@ -190,6 +191,24 @@ class MainActivity : AppCompatActivity() {
                     viewModel.savePrefs()
                 }
                 .show()
+        }
+    }
+
+    private fun recoverInterruptedLogs() {
+        val outputDir = applicationContext.getExternalFilesDir(null) ?: applicationContext.filesDir
+        try {
+            val recoveredLogs = DurableLogWriter.recoverInterruptedLogs(outputDir)
+            if (recoveredLogs.isNotEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Recovered ${recoveredLogs.size} interrupted log file(s).",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.i(TAG, "Recovered interrupted logs: ${recoveredLogs.map { it.recoveredFile.name }}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Unable to recover interrupted logs", e)
+            Toast.makeText(this, "SailLogger could not recover an interrupted log.", Toast.LENGTH_LONG).show()
         }
     }
 

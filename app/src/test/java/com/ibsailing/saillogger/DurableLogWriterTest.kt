@@ -69,6 +69,44 @@ class DurableLogWriterTest {
         assertEquals(listOf(first, second), DurableLogWriter.findRecoverableLogs(tempFolder.root))
     }
 
+    @Test
+    fun recoverInterruptedLogsPromotesActiveFileToFinishedCsv() {
+        val activeFile = tempFolder.newFile("2026-08-13_061154_Boat001.inprogress.csv")
+        activeFile.writeText("partial log")
+        val metadataFile = tempFolder.newFile("2026-08-13_061154_Boat001.session.properties")
+        metadataFile.writeText("status=${DurableLogWriter.STATUS_IN_PROGRESS}\nrowsWritten=1\n")
+
+        val recoveredLogs = DurableLogWriter.recoverInterruptedLogs(tempFolder.root)
+
+        val recoveredFile = tempFolder.root.resolve("2026-08-13_061154_Boat001.csv")
+        assertEquals(1, recoveredLogs.size)
+        assertEquals(recoveredFile, recoveredLogs.first().recoveredFile)
+        assertFalse(activeFile.exists())
+        assertTrue(recoveredFile.exists())
+        assertEquals("partial log", recoveredFile.readText())
+
+        val metadata = readProperties(metadataFile)
+        assertEquals(DurableLogWriter.STATUS_RECOVERED, metadata.getProperty("status"))
+        assertEquals(activeFile.name, metadata.getProperty("activeFile"))
+        assertEquals(recoveredFile.name, metadata.getProperty("finalFile"))
+    }
+
+    @Test
+    fun recoverInterruptedLogsDoesNotOverwriteExistingFinalFile() {
+        val finalFile = tempFolder.newFile("2026-08-13_061154_Boat001.csv")
+        finalFile.writeText("finished log")
+        val activeFile = tempFolder.newFile("2026-08-13_061154_Boat001.inprogress.csv")
+        activeFile.writeText("partial log")
+
+        val recoveredLogs = DurableLogWriter.recoverInterruptedLogs(tempFolder.root)
+
+        val recoveredFile = tempFolder.root.resolve("2026-08-13_061154_Boat001_Recovered.csv")
+        assertEquals(1, recoveredLogs.size)
+        assertEquals(recoveredFile, recoveredLogs.first().recoveredFile)
+        assertEquals("finished log", finalFile.readText())
+        assertEquals("partial log", recoveredFile.readText())
+    }
+
     private fun testConfig(): DurableLogConfig =
         DurableLogConfig(
             startTimestamp = 1786601514000,

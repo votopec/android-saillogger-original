@@ -3,6 +3,7 @@ package com.ibsailing.saillogger
 import java.io.BufferedWriter
 import java.io.Closeable
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.time.Instant
@@ -33,6 +34,11 @@ data class DurableLogSnapshot(
     val rowsWritten: Long,
     val gpsRowsWritten: Long,
     val lastTimestamp: Long,
+)
+
+data class RecoveredLog(
+    val interruptedFileName: String,
+    val recoveredFile: File,
 )
 
 class DurableLogWriter(
@@ -154,6 +160,7 @@ class DurableLogWriter(
         const val METADATA_SUFFIX = ".session.properties"
         const val STATUS_IN_PROGRESS = "in_progress"
         const val STATUS_FINISHED = "finished"
+        const val STATUS_RECOVERED = "recovered"
         private const val DEFAULT_SYNC_EVERY_ROWS = 20
 
         fun buildHeader(config: DurableLogConfig): String {
@@ -185,5 +192,59 @@ class DurableLogWriter(
             rootDir.listFiles { file ->
                 file.isFile && file.name.endsWith(IN_PROGRESS_SUFFIX)
             }?.sortedBy { it.name } ?: emptyList()
+
+        fun recoverInterruptedLogs(rootDir: File): List<RecoveredLog> =
+            findRecoverableLogs(rootDir).mapNotNull { activeFile ->
+                val baseName = activeFile.name.removeSuffix(IN_PROGRESS_SUFFIX)
+                val targetFile = nextAvailableRecoveredFile(rootDir, baseName)
+                if (!activeFile.renameTo(targetFile)) {
+                    return@mapNotNull null
+                }
+
+                writeRecoveryMetadata(rootDir, baseName, activeFile.name, targetFile.name)
+                RecoveredLog(activeFile.name, targetFile)
+            }
+
+        private fun nextAvailableRecoveredFile(rootDir: File, baseName: String): File {
+            val normalFinalFile = File(rootDir, "$baseName.csv")
+            if (!normalFinalFile.exists()) {
+                return normalFinalFile
+            }
+
+            var index = 1
+            while (true) {
+                val suffix = if (index == 1) "_Recovered" else "_Recovered_$index"
+                val candidate = File(rootDir, "$baseName$suffix.csv")
+                if (!candidate.exists()) {
+                    return candidate
+                }
+                index++
+            }
+        }
+
+        private fun writeRecoveryMetadata(
+            rootDir: File,
+            baseName: String,
+            interruptedFileName: String,
+            recoveredFileName: String,
+        ) {
+            val metadataFile = File(rootDir, "$baseName$METADATA_SUFFIX")
+            val props = Properties()
+            if (metadataFile.exists()) {
+                FileInputStream(metadataFile).use { props.load(it) }
+            }
+
+            props["status"] = STATUS_RECOVERED
+            props["baseName"] = baseName
+            props["activeFile"] = interruptedFileName
+            props["finalFile"] = recoveredFileName
+            props["recoveredAt"] = System.currentTimeMillis().toString()
+            props["updatedAt"] = System.currentTimeMillis().toString()
+
+            FileOutputStream(metadataFile, false).use {
+                props.store(it, "SailLogger recovered recording session")
+                it.fd.sync()
+            }
+        }
     }
 }

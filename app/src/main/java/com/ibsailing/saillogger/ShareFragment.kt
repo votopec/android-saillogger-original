@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ibsailing.saillogger.databinding.FragmentShareBinding
+import java.io.File
 
 
 
@@ -42,7 +43,7 @@ class ShareFragment : Fragment() {
 
         val fileList = requireActivity().applicationContext.getExternalFilesDir(null)
             ?.listFiles()
-            ?.filter { !it.isDirectory && (it.extension == "csv" || it.nameWithoutExtension.endsWith("events", true)) }
+            ?.filter { isShareableFile(it) }
             ?.sortedByDescending { it.name }
             ?: emptyList()
         adapter =  ShareAdapter(fileList,viewModel.eventsPerQr)
@@ -54,6 +55,14 @@ class ShareFragment : Fragment() {
 
     companion object {
         const val TAG="ShareFragment"
+
+        fun isShareableFile(file: File): Boolean {
+            if (file.isDirectory || file.name.endsWith(DurableLogWriter.IN_PROGRESS_SUFFIX)) {
+                return false
+            }
+            return file.extension.equals("csv", ignoreCase = true) ||
+                file.nameWithoutExtension.endsWith("events", ignoreCase = true)
+        }
     }
 
 
