@@ -11,6 +11,12 @@ ACTIVITY="$PACKAGE/.MainActivity"
 APK="$ROOT_DIR/app/build/outputs/apk/debug/app-debug.apk"
 REMOTE_FILES="/sdcard/Android/data/$PACKAGE/files"
 OUT_DIR="${OUT_DIR:-/private/tmp/saillogger-background-gps}"
+LOG_TAP_X="${LOG_TAP_X:-1280}"
+LOG_TAP_Y="${LOG_TAP_Y:-590}"
+UNLOCK_TAP_X="${UNLOCK_TAP_X:-1780}"
+UNLOCK_TAP_Y="${UNLOCK_TAP_Y:-65}"
+STOP_TAP_X="${STOP_TAP_X:-760}"
+STOP_TAP_Y="${STOP_TAP_Y:-60}"
 
 if [[ $# -gt 0 ]]; then
   SERIAL="$1"
@@ -62,8 +68,9 @@ sleep 1
 adb_device shell cmd location providers set-test-provider-location gps --location 45.32805,14.44360 --accuracy 3
 sleep 1
 
-# Coordinates match the refreshed LOG button on the default Pixel_Tablet emulator in portrait/letterboxed mode.
-adb_device shell input tap 1280 590
+# Defaults match the refreshed buttons on the Pixel_Tablet AVD.
+# Override LOG_TAP_*, UNLOCK_TAP_*, and STOP_TAP_* for phone AVDs.
+adb_device shell input tap "$LOG_TAP_X" "$LOG_TAP_Y"
 sleep 3
 adb_device shell input keyevent KEYCODE_HOME
 sleep 1
@@ -84,9 +91,9 @@ done
 
 adb_device shell am start -n "$ACTIVITY" >/dev/null
 sleep 2
-adb_device shell input touchscreen tap 1780 65
+adb_device shell input touchscreen tap "$UNLOCK_TAP_X" "$UNLOCK_TAP_Y"
 sleep 1
-adb_device shell input touchscreen tap 760 60
+adb_device shell input touchscreen tap "$STOP_TAP_X" "$STOP_TAP_Y"
 sleep 3
 
 latest_file="$(adb_device shell "ls -t $REMOTE_FILES/*.csv 2>/dev/null | head -1" | tr -d '\r')"
