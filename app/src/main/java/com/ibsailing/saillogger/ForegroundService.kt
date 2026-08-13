@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.concurrent.Executors
 import kotlin.math.atan
 import kotlin.math.roundToLong
 import kotlin.math.sqrt
@@ -50,12 +50,11 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
     private var mHandler: Handler? = null
     var stopService = false
 
-    //String Builder for log data.
-
-    private val logStringBuilder = StringBuilder()
-
     //number of locations logged
     var locCounter = 0
+    var loggedPointCounter = 0L
+    var logStartTimestamp = 0L
+    var lastLogTimestamp = 0L
     var isRunning = false
 
 //    logging data
@@ -67,6 +66,11 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
     lateinit var mNotificationManager: NotificationManager
     lateinit var notificationBuilder: NotificationCompat.Builder
+    private val logDispatcher = Executors.newSingleThreadExecutor { runnable ->
+        Thread(runnable, "SailLoggerLogWriter")
+    }.asCoroutineDispatcher()
+    private val serviceScope = CoroutineScope(SupervisorJob() + logDispatcher)
+    private var durableLogWriter: DurableLogWriter? = null
 
     private var isLocationWritten = true
     private var phoneTimeToGpsOffset = 0L
@@ -187,7 +191,9 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         pitchList.clear()
         heelList.clear()
         headingList.clear()
-        resetStringBuilder()
+        loggedPointCounter = 0L
+        logStartTimestamp = 0L
+        lastLogTimestamp = 0L
         isRunning = true
         stopService = false
         lastLocationTime = 0L
@@ -275,26 +281,7 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
     fun addPointsToFile() {
         debugStringBuilder.append("\nSaved: ${getTimeString(System.currentTimeMillis())}")
-                CoroutineScope(Dispatchers.IO).launch {
-                withContext(Dispatchers.IO) {
-                val stringToWrite = logStringBuilder.toString()
-                logStringBuilder.clear()
-                if (logPointList.isNotEmpty()) {
-                    val fileTimeStamp = logPointList.first().timeStamp
-                    val fileName = getFileNameNew(fileTimeStamp, boatNo)
-                    val saveFile = File(applicationContext.getExternalFilesDir(null), "$fileName.csv")
-                    try {
-                        val fileWriter = FileWriter(saveFile, true)
-                        fileWriter.write(stringToWrite)
-                        fileWriter.close()
-                    } catch (e: Exception) {
-                        Log.e(TAG, "File Write Exception")
-                        debugStringBuilder.append("\n${getTimeString(System.currentTimeMillis())}")
-                        debugStringBuilder.append("\nFile Write Exception")
-                    }
-                }
-            }
-        }
+        flushLogWriter(force = true)
     }
 
 
@@ -305,6 +292,7 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         saveDebugFile()
 
         cleanupLoggingResources()
+        finishLogWriter()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
@@ -315,7 +303,13 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         debugStringBuilder.append("\n${getTimeString(System.currentTimeMillis())}")
         debugStringBuilder.append("\nOnDestroy")
         saveDebugFile()
+        val wasRunning = isRunning
         cleanupLoggingResources()
+        if (wasRunning) {
+            closeLogWriterKeepingRecovery()
+        }
+        serviceScope.cancel()
+        logDispatcher.close()
 
         super.onDestroy()
     }
@@ -378,16 +372,15 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         }
 
 
-        logPointList.add(lp)
-        logStringBuilder.append("${lp.getCsvString(isLoggingHeel,isLoggingPitch,isLoggingHeading,isLoggingAltitude,isLoggingMagnetometer)}\n")
+        recordLogPoint(lp)
 
         //Write number of points to notification
 
-        if (logPointList.isNotEmpty() && !isLoggingPitch &&!isLoggingHeel){
-            val loggingDuration = logPointList.last().timeStamp - logPointList.first().timeStamp
+        if (loggedPointCounter > 0 && !isLoggingPitch &&!isLoggingHeel){
+            val loggingDuration = lastLogTimestamp - logStartTimestamp
             val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(loggingDuration), ZoneId.ofOffset("", ZoneOffset.UTC))
             val timeString = date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
-            notificationBuilder.setContentText("SailLogger: ${timeString}, ${logPointList.size} points")
+            notificationBuilder.setContentText("SailLogger: ${timeString}, ${loggedPointCounter} points")
             mNotificationManager.notify(notificationId, notificationBuilder.build())
         }
 
@@ -504,11 +497,11 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
                 val lp = LogPoint()
 
                 //Write number of points to notification
-                if (logPointList.isNotEmpty() && (logPointList.size * updateInterval) % 1000 == 0) {
-                    val loggingDuration = logPointList.last().timeStamp - logPointList.first().timeStamp
+                if (loggedPointCounter > 0 && (loggedPointCounter * updateInterval) % 1000 == 0L) {
+                    val loggingDuration = lastLogTimestamp - logStartTimestamp
                     val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(loggingDuration), ZoneId.ofOffset("", ZoneOffset.UTC))
                     val timeString = date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
-                    notificationBuilder.setContentText("SailLogger: ${timeString}, ${logPointList.size} points")
+                    notificationBuilder.setContentText("SailLogger: ${timeString}, ${loggedPointCounter} points")
                     mNotificationManager.notify(notificationId, notificationBuilder.build())
                 }
 
@@ -529,8 +522,7 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
                 lp.timeStamp = time
 
                 if ((!isLoggingPitch || lp.pitch != null) && (!isLoggingHeel || lp.heel != null)) {
-                    logPointList.add(lp)
-                    logStringBuilder.append("${lp.getCsvString(isLoggingHeel, isLoggingPitch, isLoggingHeading, isLoggingAltitude, isLoggingMagnetometer)}\n")
+                    recordLogPoint(lp)
                 }
             }
         }
@@ -538,17 +530,6 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
-
-
-    private fun getFileNameNew(timeStamp: Long, boatNo: Int): String {
-        var fileName: String
-        val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), ZoneId.of("UTC"))
-        fileName = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
-        fileName += "_Boat"
-        fileName += String.format(Locale.US, "%03d", boatNo)
-        //  Log.d(TAG, "Formatted Date: $fileName")
-        return fileName
-    }
 
     private fun getTimeString(timeStamp: Long): String {
         val timeString: String
@@ -571,6 +552,7 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         const val CHANNEL_ID = "ForegroundServiceChannel"
         private const val TAG = "ForegroundService"
         private const val WAKE_LOCK_TIMEOUT_MS = 24L * 60L * 60L * 1000L
+        private const val MAX_RECENT_LOG_POINTS = 2000
     }
 
     override fun onProviderDisabled(provider: String) {
@@ -594,14 +576,15 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
 
     private fun saveDebugFile() {
-        CoroutineScope(Dispatchers.IO).launch {
-            withContext(Dispatchers.IO) {
-                val fileWriter = FileWriter(saveDebugFile, true)
-                fileWriter.write(debugStringBuilder.toString())
-                fileWriter.close()
-                debugStringBuilder.clear()
-
-            }
+        val debugText = debugStringBuilder.toString()
+        debugStringBuilder.clear()
+        if (debugText.isBlank()) {
+            return
+        }
+        serviceScope.launch {
+            val fileWriter = FileWriter(saveDebugFile, true)
+            fileWriter.write(debugText)
+            fileWriter.close()
         }
     }
 
@@ -624,24 +607,80 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         wakeLock = null
     }
 
+    private fun recordLogPoint(logPoint: LogPoint) {
+        if (logStartTimestamp == 0L) {
+            logStartTimestamp = logPoint.timeStamp
+        }
+        lastLogTimestamp = logPoint.timeStamp
+        loggedPointCounter++
 
-    private fun resetStringBuilder() {
-        //fill title row for csv
-        logStringBuilder.clear()
-        logStringBuilder.append("#Team:${teamName}\n")
-        logStringBuilder.append("#BoatNo:${boatNo}\n")
-        logStringBuilder.append("#Source:SailLoggerRaw\n")
-        logStringBuilder.append("#Interval:${updateInterval}\n")
-        logStringBuilder.append("#Device:${Build.BRAND} ${Build.MODEL}\n")
-        logStringBuilder.append("#Android:${Build.VERSION.SDK_INT}\n")
-        logStringBuilder.append(resources.getString(R.string.csv_fields))
-        if(isLoggingHeel)logStringBuilder.append(",heel")
-        if(isLoggingPitch)logStringBuilder.append(",pitch")
-        if(isLoggingHeading)logStringBuilder.append(",heading")
-        if(isLoggingAltitude)logStringBuilder.append(",altitude")
-        if(isLoggingMagnetometer)logStringBuilder.append(",magnetx,magnety,magnetz")
+        logPointList.add(logPoint)
+        if (logPointList.size > MAX_RECENT_LOG_POINTS) {
+            logPointList.removeAt(0)
+        }
 
-        logStringBuilder.append("\n")
+        val csvLine = logPoint.getCsvString(
+            isLoggingHeel,
+            isLoggingPitch,
+            isLoggingHeading,
+            isLoggingAltitude,
+            isLoggingMagnetometer
+        )
+        val hasGps = logPoint.location != null
+        serviceScope.launch {
+            writerFor(logPoint.timeStamp).appendRow(csvLine, hasGps, logPoint.timeStamp)
+        }
+    }
+
+    private fun writerFor(startTimestamp: Long): DurableLogWriter {
+        durableLogWriter?.let { return it }
+        val outputDir = applicationContext.getExternalFilesDir(null) ?: applicationContext.filesDir
+        val writer = DurableLogWriter(
+            outputDir,
+            DurableLogConfig(
+                startTimestamp = startTimestamp,
+                boatNo = boatNo,
+                teamName = teamName,
+                updateInterval = updateInterval,
+                deviceName = "${Build.BRAND} ${Build.MODEL}",
+                androidSdk = Build.VERSION.SDK_INT,
+                isLoggingHeel = isLoggingHeel,
+                isLoggingPitch = isLoggingPitch,
+                isLoggingHeading = isLoggingHeading,
+                isLoggingAltitude = isLoggingAltitude,
+                isLoggingMagnetometer = isLoggingMagnetometer,
+            )
+        )
+        writer.start()
+        durableLogWriter = writer
+        return writer
+    }
+
+    private fun flushLogWriter(force: Boolean) {
+        runBlocking {
+            withContext(logDispatcher) {
+                durableLogWriter?.flush(force = force)
+            }
+        }
+    }
+
+    private fun finishLogWriter() {
+        runBlocking {
+            withContext(logDispatcher) {
+                durableLogWriter?.finish()
+                durableLogWriter = null
+            }
+        }
+    }
+
+    private fun closeLogWriterKeepingRecovery() {
+        runBlocking {
+            withContext(logDispatcher) {
+                durableLogWriter?.flush(force = true)
+                durableLogWriter?.close()
+                durableLogWriter = null
+            }
+        }
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

@@ -242,11 +242,15 @@ private var locationsAcquired=0
             }
 
             if (viewModel.logging) {
-                    val logPointList = mService?.logPointList?:ArrayList()
+                    val service = mService
+                    val logPointList = service?.logPointList?:ArrayList()
+                    val totalLoggedPoints = service?.loggedPointCounter ?: logPointList.size.toLong()
+                    val logStartTimestamp = service?.logStartTimestamp ?: logPointList.firstOrNull()?.timeStamp ?: 0L
+                    val lastLogTimestamp = service?.lastLogTimestamp ?: logPointList.lastOrNull()?.timeStamp ?: 0L
                     if (logPointList.isNotEmpty()) {
                         val logPoint = logPointList.last()
                         val date = LocalDateTime.ofInstant(
-                            Instant.ofEpochMilli(logPoint.timeStamp-logPointList.first().timeStamp), ZoneId.ofOffset("",
+                            Instant.ofEpochMilli(lastLogTimestamp-logStartTimestamp), ZoneId.ofOffset("",
                                 ZoneOffset.UTC))
                         val durationString = date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                         binding.maxSpeedTextview.text =((mService?.maxSpeed?: (0F))* 1.94384).format(2)
@@ -260,7 +264,7 @@ private var locationsAcquired=0
                         logPoint.pitch?.let{binding.pitchTextviewLogging.text=it.format(1)}
                         binding.headingTextviewLogging.text="${viewModel.heading.roundToInt()}"
 
-                        binding.loggedPointsTextview.text="${logPointList.size}"
+                        binding.loggedPointsTextview.text="$totalLoggedPoints"
                         binding.loggedLocationsTextview.text="${mService?.locCounter}"
                         binding.loggedTimeTextview.text=durationString
                         binding.eventsNumberTextView.text= viewModel.logEventList.size.toString()
