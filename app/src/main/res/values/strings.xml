@@ -25,11 +25,11 @@
     <string name="heel">Heel</string>
     <string name="pitch">Pitch</string>
 
-    <string name="no_gps_signal">No GPS</string>
-    <string name="gps_signal_excellent">GPS excellent</string>
-    <string name="gps_signal_medium">GPS medium</string>
-    <string name="gps_not_allowed">GPS not Allowed</string>
-    <string name="backgrnd_gps_not_allowed">Background GPS\n not Allowed\n by user!</string>
+    <string name="no_gps_signal">Waiting for GPS</string>
+    <string name="gps_signal_excellent">GPS ready</string>
+    <string name="gps_signal_medium">GPS weak</string>
+    <string name="gps_not_allowed">GPS permission required</string>
+    <string name="backgrnd_gps_not_allowed">Background GPS required</string>
     <string name="in_plus_number">In: %d</string>
     <string name="gps_allowed">GPS Allowed</string>
     <string name="boat">Boat: %d</string>

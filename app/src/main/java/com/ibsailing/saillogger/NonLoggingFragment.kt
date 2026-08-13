@@ -411,14 +411,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
     private val mUpdateTimeTask: Runnable = object : Runnable {
         override fun run() {
 
-            if (!viewModel.locationAllowed) {
-                binding.statusTextview.text = getString(R.string.gps_not_allowed)
-            } else {
-                if (!viewModel.backgroundLocationAllowed) {
-                    binding.statusTextview.text = getString(R.string.backgrnd_gps_not_allowed)
-                }
-            }
-
+            updateGpsStatus(if (hasFirstLocation) viewModel.currentLocation else null)
 
             val uptime = System.currentTimeMillis()
             //If logging, navigate to Logging fragment and don't update view of this one again
@@ -496,22 +489,35 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
         }
         if (!viewModel.logging) binding.buttonStartLogging.isEnabled = true
 
-        if (hasFirstLocation) {
-
-            if (location.accuracy > 10) {
-                binding.statusTextview.text = getString(R.string.gps_signal_medium)
-                binding.statusTextview.setTextColor(resources.getColor(R.color.dark_orange, null))
-            } else {
-                binding.statusTextview.text = getString(R.string.gps_signal_excellent)
-                binding.statusTextview.setTextColor(Color.GREEN)
-            }
-        } else {
-            binding.statusTextview.text = getString(R.string.no_gps_signal)
-            binding.statusTextview.setTextColor(Color.RED)
-        }
+        updateGpsStatus(location)
 
         binding.startLineTextView.text= getStartLineString(viewModel.logEventList,location.latitude, location.longitude,location.time)
 
+    }
+
+    private fun updateGpsStatus(location: Location? = null) {
+        when {
+            !viewModel.locationAllowed -> {
+                binding.statusTextview.text = getString(R.string.gps_not_allowed)
+                binding.statusTextview.setTextColor(Color.RED)
+            }
+            !viewModel.backgroundLocationAllowed -> {
+                binding.statusTextview.text = getString(R.string.backgrnd_gps_not_allowed)
+                binding.statusTextview.setTextColor(resources.getColor(R.color.dark_orange, null))
+            }
+            !hasFirstLocation || location == null -> {
+                binding.statusTextview.text = getString(R.string.no_gps_signal)
+                binding.statusTextview.setTextColor(Color.RED)
+            }
+            location.accuracy > 10 -> {
+                binding.statusTextview.text = getString(R.string.gps_signal_medium)
+                binding.statusTextview.setTextColor(resources.getColor(R.color.dark_orange, null))
+            }
+            else -> {
+                binding.statusTextview.text = getString(R.string.gps_signal_excellent)
+                binding.statusTextview.setTextColor(Color.GREEN)
+            }
+        }
     }
 
 

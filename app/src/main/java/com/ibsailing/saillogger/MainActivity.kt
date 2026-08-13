@@ -177,14 +177,14 @@ class MainActivity : AppCompatActivity() {
     private fun checkBattery() {
         if (!isIgnoringBatteryOptimizations() && !viewModel.dontShowBattery) {
             AlertDialog.Builder(this)
-                .setTitle("App has battery optimization!")
-                .setMessage("This app can be killed by the system at any time.\nPlease find the SailLogger app on the \"All Apps\" or optimized apps list and set it not to optimize the battery.")
-                .setPositiveButton("OK") { _, _ ->
+                .setTitle("Allow background battery use?")
+                .setMessage("SailLogger can keep logging with normal battery settings, but some phones may stop GPS while locked. For long sails, set SailLogger to Unrestricted or Not optimized.")
+                .setPositiveButton("Open Settings") { _, _ ->
                     val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
                     startActivity(intent)
                 }
-                .setNegativeButton("Cancel") { _, _ ->
-                    Toast.makeText(this, "Battery Optimization might kill the logger while working in the background...", Toast.LENGTH_LONG).show()
+                .setNegativeButton("Not Now") { _, _ ->
+                    Toast.makeText(this, "Battery optimization may stop GPS logging while the phone is locked.", Toast.LENGTH_LONG).show()
                 }
                 .setNeutralButton("Don't Show Again") { _, _ ->
                     viewModel.sharedPref.edit().putBoolean(ViewModelMain.DONTSHOWAGAINBATTERY, true).apply()
