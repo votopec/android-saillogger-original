@@ -3,7 +3,7 @@ package com.ibsailing.saillogger
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
+import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -99,16 +99,15 @@ private var locationsAcquired=0
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.loggingStopButton.setOnClickListener{
-            binding.loggingStopButton.isEnabled = false
-            binding.loggingUnlockButton.isEnabled = true
+            setStopButtonLocked(true)
             stopLogging()
             findNavController().navigate(R.id.action_loggingFragment_to_nonLoggingFragment)
         }
         binding.loggingUnlockButton.setOnClickListener{
-            binding.loggingUnlockButton.isEnabled = false
-            binding.loggingStopButton.isEnabled = true
+            setStopButtonLocked(false)
         }
         binding.loggingMarkButton.setOnClickListener(loggingMarkListener)
+        setStopButtonLocked(true)
 
         if (viewModel.hasForegroundService()) {
             setService(viewModel.foregroundService)
@@ -145,6 +144,21 @@ private var locationsAcquired=0
   private fun setService(foregroundService: ForegroundService){
       mService=foregroundService
   }
+
+    private fun setStopButtonLocked(locked: Boolean) {
+        binding.loggingStopButton.isEnabled = !locked
+        binding.loggingUnlockButton.isEnabled = locked
+        binding.loggingStopButton.alpha = if (locked) 0.72f else 1.0f
+        binding.loggingStopButton.backgroundTintList = ColorStateList.valueOf(
+            resources.getColor(if (locked) R.color.button_disabled else R.color.status_danger, null)
+        )
+        binding.loggingStopButton.setTextColor(
+            resources.getColor(if (locked) R.color.button_disabled_text else R.color.white, null)
+        )
+        binding.stopSafetyTextView.text = getString(
+            if (locked) R.string.stop_locked_detail else R.string.stop_unlocked_detail
+        )
+    }
 
 
 
@@ -213,18 +227,18 @@ private var locationsAcquired=0
 
         if(locationsAcquired<2 || System.currentTimeMillis()-lastLocationTime>10000){
             binding.gpsTextView.text=getString(R.string.no_gps_signal)
-            binding.loggingActiveTextView.setTextColor(Color.RED)
-            binding.gpsTextView.setTextColor(Color.RED)
+            binding.loggingActiveTextView.setTextColor(resources.getColor(R.color.status_danger, null))
+            binding.gpsTextView.setTextColor(resources.getColor(R.color.status_danger, null))
         }else {
             if (locationsAcquired >= 2 && System.currentTimeMillis() - lastLocationTime < 10000 && location.accuracy < 10) {
                 binding.gpsTextView.text = getString(R.string.gps_signal_excellent)
-                binding.loggingActiveTextView.setTextColor(Color.GREEN)
-                binding.gpsTextView.setTextColor(Color.GREEN)
+                binding.loggingActiveTextView.setTextColor(resources.getColor(R.color.status_ready, null))
+                binding.gpsTextView.setTextColor(resources.getColor(R.color.status_ready, null))
 
             } else {
                 binding.gpsTextView.text = getString(R.string.gps_signal_medium)
-                binding.loggingActiveTextView.setTextColor(resources.getColor(R.color.dark_orange, null))
-                binding.gpsTextView.setTextColor(resources.getColor(R.color.dark_orange, null))
+                binding.loggingActiveTextView.setTextColor(resources.getColor(R.color.status_warning, null))
+                binding.gpsTextView.setTextColor(resources.getColor(R.color.status_warning, null))
 
             }
         }
@@ -247,6 +261,13 @@ private var locationsAcquired=0
                     val totalLoggedPoints = service?.loggedPointCounter ?: logPointList.size.toLong()
                     val logStartTimestamp = service?.logStartTimestamp ?: logPointList.firstOrNull()?.timeStamp ?: 0L
                     val lastLogTimestamp = service?.lastLogTimestamp ?: logPointList.lastOrNull()?.timeStamp ?: 0L
+                    val gpsRows = service?.locCounter ?: 0
+                    binding.loggingSaveStateTextView.text = getString(
+                        R.string.logging_save_state,
+                        totalLoggedPoints,
+                        gpsRows,
+                        viewModel.logEventList.size
+                    )
                     if (logPointList.isNotEmpty()) {
                         val logPoint = logPointList.last()
                         val date = LocalDateTime.ofInstant(
@@ -265,7 +286,7 @@ private var locationsAcquired=0
                         binding.headingTextviewLogging.text="${viewModel.heading.roundToInt()}"
 
                         binding.loggedPointsTextview.text="$totalLoggedPoints"
-                        binding.loggedLocationsTextview.text="${mService?.locCounter}"
+                        binding.loggedLocationsTextview.text="$gpsRows"
                         binding.loggedTimeTextview.text=durationString
                         binding.eventsNumberTextView.text= viewModel.logEventList.size.toString()
                     }

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/constraint_layout_logging"
+    android:background="@color/app_background"
     tools:context="com.ibsailing.saillogger.MainActivity">
 
 
@@ -30,7 +31,7 @@
     style="@style/big_colored_letters"
       android:padding="10dp"
       android:text="Team"
-    app:layout_constraintTop_toBottomOf="@id/logging_active_text_view"
+    app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view"
     app:layout_constraintStart_toStartOf="parent"/>
 
   <TextView
@@ -41,28 +42,48 @@
       android:text="1"
       android:padding="10dp"
 
-      app:layout_constraintTop_toBottomOf="@id/logging_active_text_view"
+      app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view"
       app:layout_constraintEnd_toEndOf="parent"/>
 
 <!--  Stop Button-->
   <Button
-      android:layout_width="wrap_content"
+      android:layout_width="150dp"
       android:layout_height="wrap_content"
       android:id="@+id/logging_stop_button"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginTop="@dimen/space_sm"
+      style="@style/DangerActionButton"
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      android:text="Stop"
+      android:text="@string/stop"
       android:enabled="false"
       />
 <!--  Unlock Button-->
   <Button
-      android:layout_width="wrap_content"
+      android:layout_width="150dp"
       android:layout_height="wrap_content"
       android:id="@+id/logging_unlock_button"
+      android:layout_marginTop="@dimen/space_sm"
+      android:layout_marginEnd="@dimen/space_md"
+      style="@style/SecondaryActionButton"
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      android:text="Unlock"
+      android:text="@string/unlock_stop"
       />
+
+  <TextView
+      android:id="@+id/stop_safety_text_view"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginEnd="@dimen/space_md"
+      android:gravity="center"
+      android:text="@string/stop_locked_detail"
+      android:textColor="@color/app_text_secondary"
+      android:textSize="13sp"
+      app:layout_constraintTop_toBottomOf="@id/logging_stop_button"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -87,10 +108,15 @@
 
 
   <TextView
-      style="@style/logging_data_textviews"
+      style="@style/SafetyStatusText"
       android:id="@+id/gpsTextView"
-      app:layout_constraintTop_toBottomOf="@id/logging_stop_button"
-      app:layout_constraintLeft_toLeftOf="parent" />
+      android:text="@string/no_gps_signal"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginEnd="@dimen/space_md"
+      android:background="@color/app_surface"
+      app:layout_constraintTop_toBottomOf="@id/logging_active_text_view"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
 
 
 <!--  Start Line Data-->
@@ -132,15 +158,33 @@
 
 <!--Logging Active-->
   <TextView
-      android:layout_width="wrap_content"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:id="@+id/logging_active_text_view"
-      app:layout_constraintBottom_toTopOf="@id/boat_image_view"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginTop="@dimen/space_sm"
+      android:layout_marginEnd="@dimen/space_md"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      android:textSize="40sp"
-      android:padding="5dp"
-      android:text="Logging Active"/>
+      app:layout_constraintTop_toBottomOf="@id/stop_safety_text_view"
+      style="@style/SafetyStatusText"
+      android:background="@color/app_surface"
+      android:text="@string/logging_active"/>
+
+  <TextView
+      android:id="@+id/logging_save_state_text_view"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginTop="@dimen/space_xs"
+      android:layout_marginEnd="@dimen/space_md"
+      android:gravity="center"
+      android:text="@string/logging_save_state_initial"
+      android:textColor="@color/app_text_secondary"
+      android:textSize="14sp"
+      app:layout_constraintTop_toBottomOf="@id/gpsTextView"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
 
 
 
@@ -149,9 +193,10 @@
   <Button
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Mark Now"
-      android:textSize="30sp"
+      android:text="@string/mark_now"
+      android:textSize="24sp"
       android:id="@+id/logging_mark_button"
+      style="@style/PrimaryActionButton"
       app:layout_constraintBottom_toTopOf="@id/log_data_table_layout"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
@@ -161,6 +206,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:id="@+id/log_data_table_layout"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginEnd="@dimen/space_md"
       app:layout_constraintBottom_toTopOf="@id/bottomTextView"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
@@ -287,7 +334,7 @@
         android:id="@+id/topTextView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view" />
 
     <TextView
         style="@style/top_bottom_text_views"
@@ -323,7 +370,7 @@
       android:layout_height="wrap_content"
       android:id="@+id/logging_gps_time_textview"
       android:text="0:00:00UTC"
-      app:layout_constraintTop_toBottomOf="@id/logging_unlock_button"
+      app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view"
       app:layout_constraintRight_toRightOf="parent"
       />
 

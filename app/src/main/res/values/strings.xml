@@ -53,6 +53,8 @@
     <string name="log_title">Log:</string>
     <string name="reset_zeroing">Reset Zeroing</string>
     <string name="mark_now">Mark Now</string>
+    <string name="stop">Stop</string>
+    <string name="unlock_stop">Unlock Stop</string>
     <string name="rotate">Rotate</string>
     <string name="settings">Settings</string>
     <string name="_1_s">1/S</string>
@@ -63,6 +65,11 @@
     <string name="share_file">Share file</string>
     <string name="show_events_qr">Show events QR code</string>
     <string name="copy_events">Copy events</string>
+    <string name="logging_active">Logging Active</string>
+    <string name="logging_save_state_initial">Saving GPS and sensor rows to this phone.</string>
+    <string name="logging_save_state">Saving: %1$d points, %2$d GPS rows, %3$d events</string>
+    <string name="stop_locked_detail">Stop is locked to prevent accidental taps.</string>
+    <string name="stop_unlocked_detail">Stop is unlocked. Tap Stop to finish and save the CSV.</string>
 
     <plurals name="scan_qr_title">
         <item quantity="one">Scan this code from SailViewer Menu/Events/Read QR</item>
