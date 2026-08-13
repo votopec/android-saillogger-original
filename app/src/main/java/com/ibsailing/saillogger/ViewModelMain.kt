@@ -150,10 +150,14 @@ companion object{
         override fun onServiceDisconnected(arg0: ComponentName) {
             mBound = false
             Log.d(TAG, "onServiceDisconnected")
-            Log.d(TAG, "Service is running ${foregroundService.isRunning}")
+            if (hasForegroundService()) {
+                Log.d(TAG, "Service is running ${foregroundService.isRunning}")
+            }
 
         }
     }
+
+    fun hasForegroundService(): Boolean = ::foregroundService.isInitialized
 
     fun savePrefs(){
         sharedPref.edit().putInt(BOAT_NO, boatNo).apply()

@@ -40,14 +40,12 @@ class ShareFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        val path = requireActivity().applicationContext.getExternalFilesDir(null)
-        val files=path?.listFiles()
-        val fileList=files?.toMutableList()
-        fileList?.let{ list ->
-            list.removeIf { it.isDirectory || it.extension!="csv" && !it.nameWithoutExtension.endsWith("events",true)}
-            list.sortByDescending { it.name }
-            adapter =  ShareAdapter(list,viewModel.eventsPerQr)
-        }
+        val fileList = requireActivity().applicationContext.getExternalFilesDir(null)
+            ?.listFiles()
+            ?.filter { !it.isDirectory && (it.extension == "csv" || it.nameWithoutExtension.endsWith("events", true)) }
+            ?.sortedByDescending { it.name }
+            ?: emptyList()
+        adapter =  ShareAdapter(fileList,viewModel.eventsPerQr)
 
         binding.shareRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.shareRecyclerView.adapter = adapter

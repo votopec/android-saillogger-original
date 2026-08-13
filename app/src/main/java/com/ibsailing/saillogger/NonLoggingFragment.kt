@@ -21,7 +21,9 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.Uri
 import android.os.*
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -66,6 +68,7 @@ private var locationsAcquired=0
 
 //If phone time is quite off the GPS time
 private var timeOffsetWarningShown=false
+private var backgroundPermissionPromptShown=false
 
 
 //For screen refreshing
@@ -92,8 +95,9 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
         when {
             //If got fine location
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                viewModel.locationAllowed = true
+                refreshLocationPermissionState()
                 startLocManager()
+                ensureBackgroundLocationPermission()
                 Log.d(TAG, "Precise location access granted.")
             }
 
@@ -124,13 +128,13 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
             //Permission allowed
             permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
                 Log.d(TAG, "BACKGROUND location access granted.")
-                viewModel.backgroundLocationAllowed = true
+                refreshLocationPermissionState()
                 binding.statusTextview.text = getString(R.string.gps_allowed)
             }
 
             else -> {
                 //Permission not allowed
-                viewModel.backgroundLocationAllowed = false
+                refreshLocationPermissionState()
                 AlertDialog.Builder(requireContext())
                     .setTitle("No background GPS Location Allowed")
                     .setMessage("No background GPS permission allowed. App will log only Heel/Pitch and Heading data.\nGPS will be logged only while app is visible on screen.\nPlease allow the app to use the background location...")
@@ -139,6 +143,18 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
                 Log.d(TAG, " No bckgrd location access granted.")
             }
         }
+    }
+
+    private val backgroundLocationSettingsRequest = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        refreshLocationPermissionState()
+    }
+
+    private val notificationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        Log.d(TAG, "Notification permission granted: $it")
     }
 
 
@@ -195,6 +211,9 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
 
 
         //If app doesn't have permissions needed, ask for them
+        refreshLocationPermissionState()
+        requestNotificationPermissionIfNeeded()
+
         if (!hasPermissions(requireContext(), permissionsNeeded)){
             AlertDialog.Builder(requireContext())
                 .setTitle("Sensitive permissions needed")
@@ -210,19 +229,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
                     Log.d(TAG, "locationPermissionRequest.launch executed")
                 }.setNegativeButton("Exit") { _, _ -> requireActivity().finish() }.show()
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                if (!hasPermissions(requireContext(), mutableListOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))) {
-                    AlertDialog.Builder(requireContext())
-                        .setTitle("Background Position")
-                        .setMessage("App needs permission to get the GPS in the background for successful logging.\nPlease 'Allow All The Time' on next screen")
-                        .setPositiveButton("OK") { _, _ -> backGroundLocationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) }
-                        .show()
-                }
-            }
-
-
-            viewModel.backgroundLocationAllowed = true
-            viewModel.locationAllowed = true
+            ensureBackgroundLocationPermission()
         }
         if (mSensorAccelerometer != null) {
             mSensorManager!!.registerListener(
@@ -259,8 +266,9 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
         //Listeners for all buttons
         binding.nonLoggingMarkButton.setOnClickListener(markButtonListener)
         binding.buttonStartLogging.setOnClickListener{
-            startLogging()
-            navigateFromNonLogging(R.id.action_nonLoggingFragment_to_loggingFragment)
+            if (startLogging()) {
+                navigateFromNonLogging(R.id.action_nonLoggingFragment_to_loggingFragment)
+            }
         }
         binding.buttonShare.setOnClickListener{  navigateFromNonLogging(R.id.action_nonLoggingFragment_to_shareFragment)}
         binding.zeroHeelButton.setOnClickListener{
@@ -588,11 +596,62 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
 
     }
 
+    private fun refreshLocationPermissionState() {
+        viewModel.locationAllowed = ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        viewModel.backgroundLocationAllowed =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun ensureBackgroundLocationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || viewModel.backgroundLocationAllowed || backgroundPermissionPromptShown) {
+            return
+        }
+
+        backgroundPermissionPromptShown = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Background Position")
+                .setMessage("SailLogger needs 'Allow all the time' location access so GPS logging can continue reliably while the phone is locked or the app is in the background.")
+                .setPositiveButton("Open Settings") { _, _ ->
+                    val intent = Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.fromParts("package", requireContext().packageName, null)
+                    )
+                    backgroundLocationSettingsRequest.launch(intent)
+                }
+                .setNegativeButton("Later", null)
+                .show()
+        } else {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Background Position")
+                .setMessage("SailLogger needs permission to get GPS in the background for reliable logging.\nPlease select 'Allow all the time' on the next screen.")
+                .setPositiveButton("OK") {
+                    _, _ -> backGroundLocationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+                }
+                .setNegativeButton("Later", null)
+                .show()
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     private fun startLocManager() {
         if (locManager != null) {
             if (requireActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 viewModel.locationAllowed = true
-                locManager!!.requestLocationUpdates("gps", 0, 0f, this)
+                locManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
             } else {
                 viewModel.locationAllowed = false
             }
@@ -626,8 +685,28 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
         binding.versionTextView.text = getString(R.string.version, BuildConfig.VERSION_NAME)
     }
 
-    private fun startLogging() {
+    private fun startLogging(): Boolean {
 
+            refreshLocationPermissionState()
+            if (!viewModel.locationAllowed) {
+                locationPermissionRequest.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                    )
+                )
+                Toast.makeText(requireContext(), "Precise GPS permission is needed before logging.", Toast.LENGTH_LONG).show()
+                return false
+            }
+            if (!viewModel.hasForegroundService()) {
+                requireContext().bindService(viewModel.serviceIntent, viewModel.connection, AppCompatActivity.BIND_AUTO_CREATE)
+                Toast.makeText(requireContext(), "Preparing GPS logger, try Log again in a moment.", Toast.LENGTH_SHORT).show()
+                return false
+            }
+            if (!viewModel.backgroundLocationAllowed) {
+                ensureBackgroundLocationPermission()
+                Toast.makeText(requireContext(), "Allow all-the-time location for the most reliable background GPS.", Toast.LENGTH_LONG).show()
+            }
 
             saveEvents(viewModel.logEventList, requireContext(),clearEvents=true)
             viewModel.logEventList.clear()
@@ -645,6 +724,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
         viewModel.foregroundService.logPointList.clear()
         viewModel.foregroundService.locCounter = 0
         viewModel.logging = true
+        return true
     }
 
 
@@ -687,4 +767,3 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
 
 
 }
-

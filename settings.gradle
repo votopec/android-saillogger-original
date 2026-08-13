@@ -6,8 +6,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-       // jcenter() // Warning: this repository is going to shut down soon
-        maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
     }
 }
 rootProject.name = "SailLogger"

@@ -8,7 +8,6 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -20,7 +19,6 @@ import android.os.*
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.work.ForegroundInfo
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileWriter
@@ -29,10 +27,10 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.math.atan
 import kotlin.math.roundToLong
 import kotlin.math.sqrt
-import kotlin.random.Random
 
 
 // foreground service to do logging
@@ -75,9 +73,9 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
 
     val logPointList = ArrayList<LogPoint>()
-    lateinit var heelList: MutableList<Double>
-    lateinit var pitchList: MutableList<Double>
-    private lateinit var headingList: MutableList<Double>
+    private var heelList: MutableList<Double> = ArrayList()
+    private var pitchList: MutableList<Double> = ArrayList()
+    private var headingList: MutableList<Double> = ArrayList()
 
 
 
@@ -133,13 +131,24 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
 
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "On start command")
           debugStringBuilder.append("\n${getTimeString(System.currentTimeMillis())}")
         debugStringBuilder.append("\nOn start command, id:$startId")
         debugStringBuilder.append("\nIntent: $intent")
 
         saveDebugFile()
+
+        if (intent == null) {
+            Log.w(TAG, "Service restart delivered without an intent")
+            stopSelf(startId)
+            return START_REDELIVER_INTENT
+        }
+
+        if (isRunning) {
+            Log.d(TAG, "Logger service is already running; ignoring duplicate start")
+            return START_REDELIVER_INTENT
+        }
 
         val action = intent.action
         Log.d(TAG, "using an intent with action $action")
@@ -166,16 +175,23 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
 
         // we need this lock so our service gets not affected by Doze Mode
+        releaseWakeLock()
         wakeLock = (getSystemService(POWER_SERVICE) as PowerManager).run {
             newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SailLogger:ForegroundServiceWakeLockTag").apply {
-                acquire()
+                acquire(WAKE_LOCK_TIMEOUT_MS)
             }
         }
 
 
         logPointList.clear()
+        pitchList.clear()
+        heelList.clear()
+        headingList.clear()
         resetStringBuilder()
         isRunning = true
+        stopService = false
+        lastLocationTime = 0L
+        maxSpeed = 0f
 
         // stuff to start the notification
         createNotificationChannel()
@@ -190,6 +206,9 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         notificationBuilder.setContentTitle("Logging data").setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentText("Sensor Logger is running").setSmallIcon(R.drawable.ic_skiff_notification)
             .setContentIntent(pendingIntent)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(notificationId, notificationBuilder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
@@ -206,7 +225,7 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            locManager!!.requestLocationUpdates("gps", 0, 0f, this)
+            locManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
         }
         locCounter = 0
         // start heel pitch sensor
@@ -281,30 +300,22 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
 
     fun stopService() {
-        isRunning = false
-        stopService = true // to stop the handler
         debugStringBuilder.append("\n${getTimeString(System.currentTimeMillis())}")
         debugStringBuilder.append("\nStopService")
         saveDebugFile()
 
-        mSensorManager?.unregisterListener(this)
-        locManager?.removeUpdates(this)
-        mHandler?.removeCallbacks(mUpdateTimeTask)
+        cleanupLoggingResources()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
-        wakeLock?.let {
-            if (it.isHeld) {
-                it.release()
-            }
-        }
     }
 
 
     override fun onDestroy() {
         Log.d(TAG, "On destroy")
-          debugStringBuilder.append("\n${getTimeString(System.currentTimeMillis())}")
+        debugStringBuilder.append("\n${getTimeString(System.currentTimeMillis())}")
         debugStringBuilder.append("\nOnDestroy")
         saveDebugFile()
+        cleanupLoggingResources()
 
         super.onDestroy()
     }
@@ -360,9 +371,11 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
 
 //   Get Median Heading and write it
-        headingList.sort()
-        lp.heading = headingList[headingList.size / 2]
-        resetHeadingAverage = true
+        if (headingList.isNotEmpty()) {
+            headingList.sort()
+            lp.heading = headingList[headingList.size / 2]
+            resetHeadingAverage = true
+        }
 
 
         logPointList.add(lp)
@@ -474,47 +487,51 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         override fun run() {
 
 
-
-            mHandler!!.postDelayed(this, updateInterval.toLong())
-
-            if(isLoggingHeel || isLoggingPitch) {
-            val uptime = System.currentTimeMillis()
-// set the flag to reset average
-            //  val loc = Location(currentLocation)
-            var time = uptime - phoneTimeToGpsOffset
-
-            // make time round number to remove small differences
-            time = (time.toDouble() / updateInterval).roundToLong() * updateInterval
-
-            // create point and add to the list
-            val lp = LogPoint()
-
-            //Write number of points to notification
-            if (logPointList.isNotEmpty() && (logPointList.size * updateInterval) % 1000 == 0) {
-                val loggingDuration = logPointList.last().timeStamp - logPointList.first().timeStamp
-                val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(loggingDuration), ZoneId.ofOffset("", ZoneOffset.UTC))
-                val timeString = date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
-                notificationBuilder.setContentText("SailLogger: ${timeString}, ${logPointList.size} points")
-                mNotificationManager.notify(notificationId, notificationBuilder.build())
+            if (stopService || !isRunning) {
+                return
             }
 
-            // calculate medians of pitch and heel collected
+            mHandler?.postDelayed(this, updateInterval.toLong())
 
-            pitchList.sort()
-            pitch = pitchList[pitchList.size / 2]
+            if (isLoggingHeel || isLoggingPitch) {
+                val uptime = System.currentTimeMillis()
+                var time = uptime - phoneTimeToGpsOffset
 
-            heelList.sort()
-            heel = heelList[heelList.size / 2]
+                // make time round number to remove small differences
+                time = (time.toDouble() / updateInterval).roundToLong() * updateInterval
 
-            resetPitchHeelAverage = true
+                // create point and add to the list
+                val lp = LogPoint()
 
+                //Write number of points to notification
+                if (logPointList.isNotEmpty() && (logPointList.size * updateInterval) % 1000 == 0) {
+                    val loggingDuration = logPointList.last().timeStamp - logPointList.first().timeStamp
+                    val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(loggingDuration), ZoneId.ofOffset("", ZoneOffset.UTC))
+                    val timeString = date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                    notificationBuilder.setContentText("SailLogger: ${timeString}, ${logPointList.size} points")
+                    mNotificationManager.notify(notificationId, notificationBuilder.build())
+                }
 
-            lp.pitch = pitch
-            lp.heel = heel
-            lp.timeStamp = time
-            logPointList.add(lp)
+                // calculate medians of pitch and heel collected
+                if (pitchList.isNotEmpty()) {
+                    pitchList.sort()
+                    pitch = pitchList[pitchList.size / 2]
+                    lp.pitch = pitch
+                }
 
-                logStringBuilder.append("${lp.getCsvString(isLoggingHeel, isLoggingPitch, isLoggingHeading, isLoggingAltitude, isLoggingMagnetometer)}\n")
+                if (heelList.isNotEmpty()) {
+                    heelList.sort()
+                    heel = heelList[heelList.size / 2]
+                    lp.heel = heel
+                }
+
+                resetPitchHeelAverage = true
+                lp.timeStamp = time
+
+                if ((!isLoggingPitch || lp.pitch != null) && (!isLoggingHeel || lp.heel != null)) {
+                    logPointList.add(lp)
+                    logStringBuilder.append("${lp.getCsvString(isLoggingHeel, isLoggingPitch, isLoggingHeading, isLoggingAltitude, isLoggingMagnetometer)}\n")
+                }
             }
         }
     }
@@ -528,7 +545,7 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
         val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), ZoneId.of("UTC"))
         fileName = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
         fileName += "_Boat"
-        fileName += String.format("%03d", boatNo)
+        fileName += String.format(Locale.US, "%03d", boatNo)
         //  Log.d(TAG, "Formatted Date: $fileName")
         return fileName
     }
@@ -553,6 +570,7 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
     companion object {
         const val CHANNEL_ID = "ForegroundServiceChannel"
         private const val TAG = "ForegroundService"
+        private const val WAKE_LOCK_TIMEOUT_MS = 24L * 60L * 60L * 1000L
     }
 
     override fun onProviderDisabled(provider: String) {
@@ -585,6 +603,25 @@ class ForegroundService : Service(), LocationListener, SensorEventListener {
 
             }
         }
+    }
+
+    private fun cleanupLoggingResources() {
+        mSensorManager?.unregisterListener(this)
+        locManager?.removeUpdates(this)
+        mHandler?.removeCallbacksAndMessages(null)
+        mHandler = null
+        releaseWakeLock()
+        isRunning = false
+        stopService = true
+    }
+
+    private fun releaseWakeLock() {
+        wakeLock?.let {
+            if (it.isHeld) {
+                it.release()
+            }
+        }
+        wakeLock = null
     }
 
 

@@ -19,6 +19,7 @@
       app:layout_constraintBottom_toBottomOf="parent"
       android:src="@drawable/boat_top"
       android:id="@+id/boat_image_view"
+      android:contentDescription="@string/boat_orientation"
       android:scaleType="fitCenter"
       android:adjustViewBounds="true"
       />

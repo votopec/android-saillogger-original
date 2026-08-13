@@ -51,6 +51,10 @@
     <string name="_1">1</string>
     <string name="unkn">UNKN</string>
     <string name="log">Log</string>
+    <string name="boat_orientation">Boat orientation</string>
+    <string name="share_file">Share file</string>
+    <string name="show_events_qr">Show events QR code</string>
+    <string name="copy_events">Copy events</string>
 
     <plurals name="scan_qr_title">
         <item quantity="one">Scan this code from SailViewer Menu/Events/Read QR</item>

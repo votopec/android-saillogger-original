@@ -20,6 +20,7 @@ import android.provider.Settings
 import android.util.DisplayMetrics
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -73,11 +74,11 @@ class MainActivity : AppCompatActivity() {
         //Location permission
 
         Log.d(TAG, "Build.VERSION.SDK_INT=${Build.VERSION.SDK_INT}")
-        //Add background location permission when needed
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            Log.d(TAG, "adding background permission to list")
-            permissionsNeeded.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                moveTaskToBack(true)
+            }
+        })
 
         viewModel.pm = getSystemService(Context.POWER_SERVICE ) as PowerManager
 
@@ -87,11 +88,6 @@ class MainActivity : AppCompatActivity() {
         startApp()
     }
 
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        moveTaskToBack(true)
-    }
 
     private fun startApp() {
         Log.d(TAG, "Startapp")

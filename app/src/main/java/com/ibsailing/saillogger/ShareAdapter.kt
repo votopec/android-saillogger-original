@@ -85,19 +85,17 @@ AlertDialog.Builder(it.context).setTitle("Events QR")
     private val shareClickListener:View.OnClickListener=View.OnClickListener {
         val file=items[it.tag as Int]
         val intent = Intent(Intent.ACTION_SEND)
-        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         val uri = FileProvider.getUriForFile(it.context, BuildConfig.APPLICATION_ID + ".fileprovider", file)
         intent.setDataAndType(uri, "text/csv")
         intent.putExtra(Intent.EXTRA_STREAM, uri)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         it.context.startActivity(Intent.createChooser(intent, "Share File ${file.name}"))
     }
 
-    lateinit var binding: ShareItemLayoutBinding
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
-        binding=ShareItemLayoutBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-        return ViewHolder(binding.root)
+        val binding=ShareItemLayoutBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -120,7 +118,7 @@ AlertDialog.Builder(it.context).setTitle("Events QR")
 
     override fun getItemCount(): Int = items.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(binding: ShareItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         val fileNameTextView: TextView = binding.fileNameTextView
         val sizeTextView: TextView = binding.sizeTextView
         val typeTextView: TextView = binding.typeTextView
@@ -162,10 +160,14 @@ AlertDialog.Builder(it.context).setTitle("Events QR")
     private fun getEventsList(clickedView:View):ArrayList<LogEvent>{
         val file = items[clickedView.tag as Int]
         if(file.nameWithoutExtension.endsWith("Events")) {
-            val text = file.readText()
-            val arrayList=Gson().fromJson(text, Array<LogEvent>::class.java).toCollection(ArrayList())
-            arrayList.sortBy { it.startTimeStamp }
-            return arrayList
+            return try {
+                val text = file.readText()
+                val arrayList=Gson().fromJson(text, Array<LogEvent>::class.java).toCollection(ArrayList())
+                arrayList.sortBy { it.startTimeStamp }
+                arrayList
+            } catch (e: Exception) {
+                ArrayList()
+            }
         }
         return ArrayList()
     }

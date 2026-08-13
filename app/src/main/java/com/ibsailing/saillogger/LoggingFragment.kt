@@ -110,7 +110,13 @@ private var locationsAcquired=0
         }
         binding.loggingMarkButton.setOnClickListener(loggingMarkListener)
 
-        setService(viewModel.foregroundService)
+        if (viewModel.hasForegroundService()) {
+            setService(viewModel.foregroundService)
+        } else {
+            viewModel.logging = false
+            findNavController().navigateUp()
+            return
+        }
 
         rotateViews()
 
@@ -388,7 +394,7 @@ private var locationsAcquired=0
             if (requireActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED
             ) {
-                locManager!!.requestLocationUpdates("gps", 0, 0f, this)
+                locManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
             }
         }
         isRefreshScreen=true
@@ -428,7 +434,7 @@ private var locationsAcquired=0
 
     private fun stopLogging() {
         Log.d(TAG, "Stop Logging")
-        if (viewModel.mBound) {
+        if (viewModel.mBound && viewModel.hasForegroundService()) {
             //viewModel.foregroundService.saveCSV(incomplete = false)
             viewModel.foregroundService.addPointsToFile()
             requireContext().unbindService(viewModel.connection)
