@@ -5,11 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     tools:context="com.ibsailing.saillogger.MainActivity">
 
     <Button
         android:id="@+id/portStartButton"
         style="@style/mark_buttons"
+        android:backgroundTint="@color/app_primary"
+        android:textColor="@color/white"
         android:text="Port (Pin)"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -17,6 +20,8 @@
         android:id="@+id/stbdStartButton"
         android:text="STBD (RC)"
         style="@style/mark_buttons"
+        android:backgroundTint="@color/app_primary"
+        android:textColor="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
@@ -25,12 +30,16 @@
         android:id="@+id/startTimeButton"
         android:text="Start Time"
         style="@style/mark_buttons"
+        android:backgroundTint="@color/app_primary"
+        android:textColor="@color/white"
         app:layout_constraintTop_toBottomOf="@id/stbdStartButton"
         app:layout_constraintStart_toStartOf="parent"
         />
     <Button
         style="@style/mark_buttons"
         android:text="Text Event"
+        android:backgroundTint="@color/app_primary"
+        android:textColor="@color/white"
         android:id="@+id/event_text_button"
         app:layout_constraintTop_toBottomOf="@id/startTimeButton"
         app:layout_constraintStart_toStartOf="parent"/>

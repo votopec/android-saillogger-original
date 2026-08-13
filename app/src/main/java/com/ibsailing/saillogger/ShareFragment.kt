@@ -48,6 +48,7 @@ class ShareFragment : Fragment() {
             ?: emptyList()
         adapter =  ShareAdapter(fileList,viewModel.eventsPerQr)
 
+        binding.shareEmptyTextView.visibility = if (fileList.isEmpty()) View.VISIBLE else View.GONE
         binding.shareRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.shareRecyclerView.adapter = adapter
     }

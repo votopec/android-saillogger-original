@@ -65,6 +65,9 @@
     <string name="share_file">Share file</string>
     <string name="show_events_qr">Show events QR code</string>
     <string name="copy_events">Copy events</string>
+    <string name="back">Back</string>
+    <string name="saved_logs">Saved Logs</string>
+    <string name="no_saved_logs">No finished logs or event files yet.</string>
     <string name="logging_active">Logging Active</string>
     <string name="logging_save_state_initial">Saving GPS and sensor rows to this phone.</string>
     <string name="logging_save_state">Saving: %1$d points, %2$d GPS rows, %3$d events</string>
