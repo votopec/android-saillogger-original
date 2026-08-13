@@ -59,9 +59,77 @@
     <style name="gps_textviews">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/status_text_size</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#FF0000</item>
+        <item name="android:textColor">@color/status_danger</item>
+    </style>
+
+    <style name="SafetyStatusText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/status_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingHorizontal">@dimen/space_md</item>
+        <item name="android:paddingVertical">@dimen/space_sm</item>
+        <item name="android:textColor">@color/status_danger</item>
+    </style>
+
+    <style name="SafetyScreenTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="MetricLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/metric_label_text_size</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
+    </style>
+
+    <style name="MetricValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/metric_value_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="PrimaryActionButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/button_min_height</item>
+        <item name="android:paddingHorizontal">@dimen/space_lg</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/app_primary</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+    </style>
+
+    <style name="SecondaryActionButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/button_min_height</item>
+        <item name="android:paddingHorizontal">@dimen/space_lg</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+        <item name="backgroundTint">@color/app_surface_alt</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+    </style>
+
+    <style name="DangerActionButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/button_min_height</item>
+        <item name="android:paddingHorizontal">@dimen/space_lg</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/status_danger</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
     </style>
 
     <style name="mark_buttons">

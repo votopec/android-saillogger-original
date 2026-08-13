@@ -10,4 +10,17 @@
     <color name="dark_orange">#FFEE8C00</color>
     <color name="gray">#FF808080</color>
     <color name="dark_gray">#FF606060</color>
+    <color name="app_background">#FFF7FAFC</color>
+    <color name="app_surface">#FFFFFFFF</color>
+    <color name="app_surface_alt">#FFE8F1F4</color>
+    <color name="app_text_primary">#FF102027</color>
+    <color name="app_text_secondary">#FF53636A</color>
+    <color name="app_primary">#FF006C67</color>
+    <color name="app_primary_dark">#FF004F4B</color>
+    <color name="app_accent">#FF2F80ED</color>
+    <color name="status_ready">#FF12805C</color>
+    <color name="status_warning">#FFC66A00</color>
+    <color name="status_danger">#FFD32F2F</color>
+    <color name="button_disabled">#FFC7D1D6</color>
+    <color name="button_disabled_text">#FF66757D</color>
 </resources>

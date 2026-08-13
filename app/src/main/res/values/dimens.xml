@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_sm">8dp</dimen>
+    <dimen name="space_md">16dp</dimen>
+    <dimen name="space_lg">24dp</dimen>
+    <dimen name="space_xl">32dp</dimen>
+    <dimen name="screen_padding">20dp</dimen>
+    <dimen name="button_min_height">52dp</dimen>
+    <dimen name="button_corner_radius">8dp</dimen>
+    <dimen name="status_text_size">18sp</dimen>
+    <dimen name="metric_label_text_size">13sp</dimen>
+    <dimen name="metric_value_text_size">22sp</dimen>
+    <dimen name="hero_value_text_size">44sp</dimen>
 
     <!--    Numeric Keyboard-->
     <dimen name="numeric_title_text_size">25sp</dimen>
