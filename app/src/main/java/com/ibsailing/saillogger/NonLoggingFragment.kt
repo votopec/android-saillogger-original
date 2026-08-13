@@ -608,8 +608,11 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
             ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun ensureBackgroundLocationPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || viewModel.backgroundLocationAllowed || backgroundPermissionPromptShown) {
+    private fun ensureBackgroundLocationPermission(forcePrompt: Boolean = false) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || viewModel.backgroundLocationAllowed) {
+            return
+        }
+        if (backgroundPermissionPromptShown && !forcePrompt) {
             return
         }
 
@@ -704,8 +707,13 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
                 return false
             }
             if (!viewModel.backgroundLocationAllowed) {
-                ensureBackgroundLocationPermission()
-                Toast.makeText(requireContext(), "Allow all-the-time location for the most reliable background GPS.", Toast.LENGTH_LONG).show()
+                ensureBackgroundLocationPermission(forcePrompt = true)
+                Toast.makeText(
+                    requireContext(),
+                    "Allow all-the-time location before starting a GPS log.",
+                    Toast.LENGTH_LONG
+                ).show()
+                return false
             }
 
             saveEvents(viewModel.logEventList, requireContext(),clearEvents=true)
