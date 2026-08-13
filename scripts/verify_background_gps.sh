@@ -41,6 +41,7 @@ mkdir -p "$OUT_DIR"
 )
 
 adb_device install -r "$APK" >/dev/null
+adb_device shell "mkdir -p '$REMOTE_FILES' && rm -f '$REMOTE_FILES'/*.csv '$REMOTE_FILES'/*.properties" >/dev/null 2>&1 || true
 adb_device shell pm grant "$PACKAGE" android.permission.ACCESS_FINE_LOCATION >/dev/null 2>&1 || true
 adb_device shell pm grant "$PACKAGE" android.permission.ACCESS_COARSE_LOCATION >/dev/null 2>&1 || true
 adb_device shell pm grant "$PACKAGE" android.permission.ACCESS_BACKGROUND_LOCATION >/dev/null 2>&1 || true
@@ -56,9 +57,13 @@ adb_device shell cmd location providers set-test-provider-location gps --locatio
 adb_device shell am force-stop "$PACKAGE" >/dev/null 2>&1 || true
 adb_device shell am start -n "$ACTIVITY" >/dev/null
 sleep 3
+adb_device shell cmd location providers set-test-provider-location gps --location 45.32800,14.44350 --accuracy 3
+sleep 1
+adb_device shell cmd location providers set-test-provider-location gps --location 45.32805,14.44360 --accuracy 3
+sleep 1
 
-# Coordinates match the default Pixel_Tablet emulator in portrait/letterboxed mode.
-adb_device shell input tap 1280 440
+# Coordinates match the refreshed LOG button on the default Pixel_Tablet emulator in portrait/letterboxed mode.
+adb_device shell input tap 1280 590
 sleep 3
 adb_device shell input keyevent KEYCODE_HOME
 sleep 1

@@ -5,16 +5,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/constraint_layout_non_logging"
+        android:background="@color/app_background"
         tools:context="com.ibsailing.saillogger.MainActivity">
 
     <TextView
-
         android:text="@string/no_gps_signal"
-        style="@style/gps_textviews"
+        style="@style/SafetyStatusText"
         android:id="@+id/status_textview"
+        android:background="@color/app_surface"
+        android:elevation="2dp"
+        android:layout_marginStart="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_md"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         />
+
+    <TextView
+        android:id="@+id/status_detail_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_xs"
+        android:layout_marginEnd="@dimen/space_md"
+        android:gravity="center"
+        android:text="@string/gps_waiting_detail"
+        android:textColor="@color/app_text_secondary"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/status_textview"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
     <!--Boat ImageView-->
@@ -50,7 +71,7 @@
         android:id="@+id/topTextView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/status_detail_text_view" />
 
     <TextView
         style="@style/top_bottom_text_views"
@@ -203,15 +224,33 @@
 
 <!--Log-->
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/log"
-        android:textSize="50sp"
+        android:textSize="42sp"
         android:layout_marginTop="20dp"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
         android:id="@+id/button_start_logging"
+        style="@style/PrimaryActionButton"
         app:layout_constraintTop_toBottomOf="@id/zero_heel_button"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
+
+    <TextView
+        android:id="@+id/log_button_helper_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_sm"
+        android:layout_marginEnd="@dimen/space_lg"
+        android:gravity="center"
+        android:text="@string/log_button_waiting"
+        android:textColor="@color/app_text_secondary"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/button_start_logging"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 

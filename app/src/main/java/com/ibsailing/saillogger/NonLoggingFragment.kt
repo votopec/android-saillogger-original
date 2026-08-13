@@ -13,7 +13,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.Color
+import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -98,6 +98,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
                 refreshLocationPermissionState()
                 startLocManager()
                 ensureBackgroundLocationPermission()
+                updateGpsStatus()
                 Log.d(TAG, "Precise location access granted.")
             }
 
@@ -111,6 +112,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
                     .show()
                 viewModel.locationAllowed = false
                 viewModel.backgroundLocationAllowed = false
+                updateGpsStatus()
             }
         }
     }
@@ -129,12 +131,13 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
             permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
                 Log.d(TAG, "BACKGROUND location access granted.")
                 refreshLocationPermissionState()
-                binding.statusTextview.text = getString(R.string.gps_allowed)
+                updateGpsStatus(if (hasFirstLocation) viewModel.currentLocation else null)
             }
 
             else -> {
                 //Permission not allowed
                 refreshLocationPermissionState()
+                updateGpsStatus(if (hasFirstLocation) viewModel.currentLocation else null)
                 AlertDialog.Builder(requireContext())
                     .setTitle("No background GPS Location Allowed")
                     .setMessage("No background GPS permission allowed. App will log only Heel/Pitch and Heading data.\nGPS will be logged only while app is visible on screen.\nPlease allow the app to use the background location...")
@@ -149,6 +152,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
         ActivityResultContracts.StartActivityForResult()
     ) {
         refreshLocationPermissionState()
+        updateGpsStatus(if (hasFirstLocation) viewModel.currentLocation else null)
     }
 
     private val notificationPermissionRequest = registerForActivityResult(
@@ -212,6 +216,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
 
         //If app doesn't have permissions needed, ask for them
         refreshLocationPermissionState()
+        updateGpsStatus()
         requestNotificationPermissionIfNeeded()
 
         if (!hasPermissions(requireContext(), permissionsNeeded)){
@@ -287,6 +292,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
 
 
         fillTextViews()
+        updateGpsStatus()
 
 
         //Refresh screen every 1000ms
@@ -476,7 +482,7 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
         val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(gpsTime), ZoneId.of("UTC"))
         val timeString = date.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
         binding.gpsTimeTextview.text = "${timeString}UTC"
-        if (!hasFirstLocation && locationsAcquired > 1) {
+        if (!hasFirstLocation && locationsAcquired >= 1) {
             Log.d(TAG, "Got first location at: $timeString UTC and offset is ${viewModel.phoneTimeToGpsOffset} ")
             hasFirstLocation = true
             if (abs(viewModel.phoneTimeToGpsOffset) > 600000L && !timeOffsetWarningShown) {
@@ -487,8 +493,6 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
                     .show()
             }
         }
-        if (!viewModel.logging) binding.buttonStartLogging.isEnabled = true
-
         updateGpsStatus(location)
 
         binding.startLineTextView.text= getStartLineString(viewModel.logEventList,location.latitude, location.longitude,location.time)
@@ -499,25 +503,55 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
         when {
             !viewModel.locationAllowed -> {
                 binding.statusTextview.text = getString(R.string.gps_not_allowed)
-                binding.statusTextview.setTextColor(Color.RED)
+                binding.statusDetailTextView.text = getString(R.string.gps_permission_detail)
+                binding.statusTextview.setTextColor(resources.getColor(R.color.status_danger, null))
             }
             !viewModel.backgroundLocationAllowed -> {
                 binding.statusTextview.text = getString(R.string.backgrnd_gps_not_allowed)
-                binding.statusTextview.setTextColor(resources.getColor(R.color.dark_orange, null))
+                binding.statusDetailTextView.text = getString(R.string.background_gps_detail)
+                binding.statusTextview.setTextColor(resources.getColor(R.color.status_warning, null))
             }
             !hasFirstLocation || location == null -> {
                 binding.statusTextview.text = getString(R.string.no_gps_signal)
-                binding.statusTextview.setTextColor(Color.RED)
+                binding.statusDetailTextView.text = getString(R.string.gps_waiting_detail)
+                binding.statusTextview.setTextColor(resources.getColor(R.color.status_danger, null))
             }
             location.accuracy > 10 -> {
                 binding.statusTextview.text = getString(R.string.gps_signal_medium)
-                binding.statusTextview.setTextColor(resources.getColor(R.color.dark_orange, null))
+                binding.statusDetailTextView.text = getString(R.string.gps_weak_detail)
+                binding.statusTextview.setTextColor(resources.getColor(R.color.status_warning, null))
             }
             else -> {
                 binding.statusTextview.text = getString(R.string.gps_signal_excellent)
-                binding.statusTextview.setTextColor(Color.GREEN)
+                binding.statusDetailTextView.text = getString(R.string.gps_ready_detail)
+                binding.statusTextview.setTextColor(resources.getColor(R.color.status_ready, null))
             }
         }
+        updateLogButtonState()
+    }
+
+    private fun updateLogButtonState() {
+        val canStartLogging = viewModel.locationAllowed &&
+            viewModel.backgroundLocationAllowed &&
+            hasFirstLocation &&
+            viewModel.hasForegroundService()
+        binding.buttonStartLogging.isEnabled = canStartLogging
+        binding.buttonStartLogging.alpha = if (canStartLogging) 1.0f else 0.78f
+        binding.buttonStartLogging.backgroundTintList = ColorStateList.valueOf(
+            resources.getColor(
+                if (canStartLogging) R.color.app_primary else R.color.button_disabled,
+                null
+            )
+        )
+        binding.buttonStartLogging.setTextColor(
+            resources.getColor(
+                if (canStartLogging) R.color.white else R.color.button_disabled_text,
+                null
+            )
+        )
+        binding.logButtonHelperTextView.text = getString(
+            if (canStartLogging) R.string.log_button_ready else R.string.log_button_waiting
+        )
     }
 
 
@@ -709,7 +743,12 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
             }
             if (!viewModel.hasForegroundService()) {
                 requireContext().bindService(viewModel.serviceIntent, viewModel.connection, AppCompatActivity.BIND_AUTO_CREATE)
-                Toast.makeText(requireContext(), "Preparing GPS logger, try Log again in a moment.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.logger_starting), Toast.LENGTH_SHORT).show()
+                return false
+            }
+            if (!hasFirstLocation) {
+                updateGpsStatus()
+                Toast.makeText(requireContext(), getString(R.string.gps_waiting_detail), Toast.LENGTH_LONG).show()
                 return false
             }
             if (!viewModel.backgroundLocationAllowed) {

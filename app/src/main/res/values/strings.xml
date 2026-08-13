@@ -30,6 +30,14 @@
     <string name="gps_signal_medium">GPS weak</string>
     <string name="gps_not_allowed">GPS permission required</string>
     <string name="backgrnd_gps_not_allowed">Background GPS required</string>
+    <string name="gps_permission_detail">Allow precise location to use GPS logging.</string>
+    <string name="background_gps_detail">Allow all-the-time location before starting a GPS log.</string>
+    <string name="gps_waiting_detail">Waiting for a live GPS fix before logging.</string>
+    <string name="gps_weak_detail">GPS is available but accuracy is weak. Logging can start if needed.</string>
+    <string name="gps_ready_detail">Ready for background GPS logging.</string>
+    <string name="log_button_waiting">Log unlocks when GPS and background location are ready.</string>
+    <string name="log_button_ready">Ready. Tap Log to start saving the session.</string>
+    <string name="logger_starting">Preparing GPS logger. Try again in a moment.</string>
     <string name="in_plus_number">In: %d</string>
     <string name="gps_allowed">GPS Allowed</string>
     <string name="boat">Boat: %d</string>
