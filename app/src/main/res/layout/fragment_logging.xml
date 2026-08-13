@@ -31,7 +31,7 @@
     style="@style/big_colored_letters"
       android:padding="10dp"
       android:text="Team"
-    app:layout_constraintTop_toBottomOf="@id/logging_sensor_strip"
+    app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view"
     app:layout_constraintStart_toStartOf="parent"/>
 
   <TextView
@@ -42,7 +42,7 @@
       android:text="1"
       android:padding="10dp"
 
-      app:layout_constraintTop_toBottomOf="@id/logging_sensor_strip"
+      app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view"
       app:layout_constraintEnd_toEndOf="parent"/>
 
 <!--  Stop Button-->
@@ -144,7 +144,7 @@
         android:textSize="40sp"
         android:text="0.0"
         android:textStyle="bold"
-        android:textColor="?attr/colorOnSurface"
+        android:textColor="@color/app_text_primary"
         app:layout_constraintBottom_toTopOf="@id/logging_mark_button"
         app:layout_constraintStart_toEndOf="@id/sog_title_text_view"/>
     <TextView
@@ -185,60 +185,6 @@
       app:layout_constraintTop_toBottomOf="@id/gpsTextView"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent" />
-
-  <LinearLayout
-      android:id="@+id/logging_sensor_strip"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/space_md"
-      android:layout_marginTop="@dimen/space_xs"
-      android:layout_marginEnd="@dimen/space_md"
-      android:background="@color/app_surface_alt"
-      android:gravity="center"
-      android:orientation="horizontal"
-      android:paddingHorizontal="@dimen/space_md"
-      android:paddingVertical="@dimen/space_sm"
-      app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent">
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
-      <TextView
-          style="@style/MetricLabel"
-          android:text="Heel" />
-
-      <TextView
-          android:id="@+id/heel_textview_logging"
-          style="@style/MetricValue"
-          android:text="--" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
-      <TextView
-          style="@style/MetricLabel"
-          android:text="Pitch" />
-
-      <TextView
-          android:id="@+id/pitch_textview_logging"
-          style="@style/MetricValue"
-          android:text="--" />
-    </LinearLayout>
-  </LinearLayout>
-
-
-
 
   <!--Mark Now Button-->
   <Button
@@ -287,6 +233,15 @@
           android:text="0"
           android:id="@+id/max_speed_textview"
           />
+      <TextView
+          android:text="Heel:"
+          style="@style/logging_data_textviews" />
+      <TextView
+          android:id="@+id/heel_textview_logging"
+          android:textAlignment="viewEnd"
+          style="@style/logging_data_textviews_values"
+          android:text="--"
+          />
 
 
     </TableRow>
@@ -314,6 +269,16 @@
         android:text="0"
         android:id="@+id/events_number_text_view"
         />
+      <!--  Pitch-->
+      <TextView
+          android:text="Pitch:"
+          style="@style/logging_data_textviews" />
+      <TextView
+          android:id="@+id/pitch_textview_logging"
+          style="@style/logging_data_textviews_values"
+          android:text="--"
+          android:textAlignment="viewEnd"
+          />
 
     </TableRow>
 <TableRow>
@@ -366,7 +331,7 @@
         android:id="@+id/topTextView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logging_sensor_strip" />
+        app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view" />
 
     <TextView
         style="@style/top_bottom_text_views"
@@ -402,7 +367,7 @@
       android:layout_height="wrap_content"
       android:id="@+id/logging_gps_time_textview"
       android:text="0:00:00UTC"
-      app:layout_constraintTop_toBottomOf="@id/logging_sensor_strip"
+      app:layout_constraintTop_toBottomOf="@id/logging_save_state_text_view"
       app:layout_constraintRight_toRightOf="parent"
       />
 
