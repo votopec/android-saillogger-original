@@ -60,6 +60,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/versionTextView"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginBottom="@dimen/space_sm"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -87,6 +89,7 @@
         style="@style/top_bottom_text_views"
         android:text="port"
         android:id="@+id/leftTextView"
+        android:layout_marginStart="@dimen/space_lg"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent" />
@@ -95,6 +98,7 @@
         style="@style/top_bottom_text_views"
         android:text="stbd"
         android:id="@+id/rightTextView"
+        android:layout_marginEnd="@dimen/space_lg"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
@@ -106,6 +110,8 @@
         android:layout_height="wrap_content"
         android:text="Share"
         android:id="@+id/button_share"
+        android:layout_marginEnd="@dimen/space_lg"
+        style="@style/SecondaryActionButton"
         app:layout_constraintTop_toTopOf="@id/topTextView"
         app:layout_constraintRight_toRightOf="parent"
         />
@@ -131,18 +137,6 @@
         style="@style/ptc_heel_az_textviews"
         />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Zero"
-        android:id="@+id/zero_heel_button"
-        android:layout_marginBottom="20sp"
-        app:layout_constraintTop_toBottomOf="@id/heel_textview"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@id/guidelineFirstThird"
-
-
-        />
     <!--  Pitch-->
 
 
@@ -161,15 +155,6 @@
         android:text="0.0"
         app:layout_constraintRight_toRightOf="@id/guidelineSecondThird"
         style="@style/ptc_heel_az_textviews"
-        />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Zero"
-        android:id="@+id/button_zero_pitch"
-        app:layout_constraintBottom_toBottomOf="@id/zero_heel_button"
-        app:layout_constraintRight_toRightOf="@id/guidelineSecondThird"
-        app:layout_constraintLeft_toLeftOf="@id/guidelineFirstThird"
         />
     <!--  Azimuth-->
     <TextView
@@ -192,7 +177,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/gps_time_textview"
         android:text="0:00:00UTC"
-        app:layout_constraintBottom_toBottomOf="@id/zero_heel_button"
+        android:layout_marginTop="@dimen/space_xs"
+        android:layout_marginEnd="@dimen/space_lg"
+        app:layout_constraintTop_toBottomOf="@id/heading_textview"
         app:layout_constraintRight_toRightOf="parent"
         />
 
@@ -233,7 +220,7 @@
         android:layout_marginEnd="@dimen/space_lg"
         android:id="@+id/button_start_logging"
         style="@style/PrimaryActionButton"
-        app:layout_constraintTop_toBottomOf="@id/zero_heel_button"
+        app:layout_constraintTop_toBottomOf="@id/gps_time_textview"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
@@ -270,6 +257,7 @@
         style="@style/big_colored_letters"
         android:text="@string/unkn"
         android:id="@+id/team_text_view"
+        android:layout_marginStart="@dimen/space_lg"
         app:layout_constraintBottom_toTopOf="@id/non_logging_mark_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/boat_no_text_view"
@@ -281,6 +269,7 @@
         style="@style/big_colored_letters"
         android:text="@string/_1"
         android:id="@+id/boat_no_text_view"
+        android:layout_marginEnd="@dimen/space_lg"
         app:layout_constraintBottom_toBottomOf="@id/team_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/team_text_view"
@@ -291,6 +280,7 @@
         style="@style/logging_data_textviews"
         android:text="@string/_1_s"
         android:id="@+id/frequency_text_view"
+        android:layout_marginStart="@dimen/space_lg"
         app:layout_constraintBottom_toTopOf="@id/settings_button"
         app:layout_constraintStart_toStartOf="parent"
         />
@@ -301,6 +291,8 @@
         android:layout_height="wrap_content"
         android:text="@string/settings"
         android:id="@+id/settings_button"
+        android:layout_marginStart="@dimen/space_lg"
+        style="@style/SecondaryActionButton"
         app:layout_constraintBottom_toTopOf="@id/bottomTextView"
         app:layout_constraintLeft_toLeftOf="parent"
         />
@@ -312,6 +304,8 @@
         android:layout_height="wrap_content"
         android:text="@string/rotate"
         android:id="@+id/button_rotate"
+        android:layout_marginEnd="@dimen/space_lg"
+        style="@style/SecondaryActionButton"
         app:layout_constraintBottom_toTopOf="@id/bottomTextView"
         app:layout_constraintRight_toRightOf="parent"
         />

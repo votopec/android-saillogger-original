@@ -37,7 +37,6 @@ import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import com.ibsailing.saillogger.databinding.FragmentNonLoggingBinding
 import java.time.Instant
 import java.time.LocalDateTime
@@ -276,14 +275,6 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
             }
         }
         binding.buttonShare.setOnClickListener{  navigateFromNonLogging(R.id.action_nonLoggingFragment_to_shareFragment)}
-        binding.zeroHeelButton.setOnClickListener{
-            viewModel.zeroHeelPressed = true
-            viewModel.zeroHeelPressedTime = System.currentTimeMillis()
-        }
-        binding.buttonZeroPitch.setOnClickListener{
-            viewModel.zeroPitchPressed = true
-            viewModel.zeroPitchPressedTime = System.currentTimeMillis()
-        }
         binding.buttonRotate.setOnClickListener(rotateButtonListener)
         binding.settingsButton.setOnClickListener{
             SettingsDialogFragment().show(
@@ -419,53 +410,15 @@ class NonLoggingFragment : Fragment(), SensorEventListener,LocationListener, Dia
 
             updateGpsStatus(if (hasFirstLocation) viewModel.currentLocation else null)
 
-            val uptime = System.currentTimeMillis()
             //If logging, navigate to Logging fragment and don't update view of this one again
             if (viewModel.logging) {
                 navigateFromNonLogging(R.id.action_nonLoggingFragment_to_loggingFragment)
             } else {
 
                 screenRefreshHandler!!.postDelayed(this, viewModel.updateInterval.toLong()) // call again after MHANDLER_REFRESH_MS
-                if (viewModel.zeroHeelPressed) {
-                    if (uptime - viewModel.zeroHeelPressedTime > 3000) {
-                        viewModel.zeroHeelPressed = false
-                        viewModel.heelOffset -= viewModel.heel - viewModel.extraHeelOffset
-
-                        context?.let {
-                            PreferenceManager.getDefaultSharedPreferences(it).edit().apply {
-                                putFloat(ViewModelMain.HEEL_OFFSET, viewModel.heelOffset.toFloat())
-                                apply()
-                            }
-                        }
-                    }
-                }
-                if (viewModel.zeroPitchPressed) {
-                    if (uptime - viewModel.zeroPitchPressedTime > 3000) {
-                        viewModel.zeroPitchPressed = false
-                        viewModel.pitchOffset -= viewModel.pitch - viewModel.extraPitchOffset
-                        context?.let {
-                            PreferenceManager.getDefaultSharedPreferences(it).edit().apply {
-                                putFloat(ViewModelMain.PITCH_OFFSET, viewModel.pitchOffset.toFloat())
-                                apply()
-                            }
-                        }
-                    }
-                }
-                if (viewModel.zeroPitchPressed || viewModel.zeroHeelPressed) {
-                    if (viewModel.zeroPitchPressed) binding.pitchTextview.text = getString(
-                        R.string.in_plus_number,
-                        ((MainActivity.ZEROVALUEDELAY + viewModel.zeroPitchPressedTime - uptime) / 1000) + 1
-                    )//"In:${((MainActivity.ZEROVALUEDELAY + viewModel.zeroPitchPressedTime - uptime) / 1000) + 1}"
-                    if (viewModel.zeroHeelPressed) binding.heelTextview.text = getString(
-                        R.string.in_plus_number,
-                        ((MainActivity.ZEROVALUEDELAY + viewModel.zeroHeelPressedTime - uptime) / 1000) + 1
-                    )//"In:${((MainActivity.ZEROVALUEDELAY + viewModel.zeroHeelPressedTime - uptime) / 1000) + 1}"
-
-                } else {
-                    binding.heelTextview.text = viewModel.heel.format(1)
-                    binding.pitchTextview.text = viewModel.pitch.format(1)
-                    binding.headingTextview.text = "${viewModel.heading.roundToInt()}"
-                }
+                binding.heelTextview.text = viewModel.heel.format(1)
+                binding.pitchTextview.text = viewModel.pitch.format(1)
+                binding.headingTextview.text = "${viewModel.heading.roundToInt()}"
             }
         }
     }

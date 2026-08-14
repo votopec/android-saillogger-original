@@ -159,6 +159,57 @@ companion object{
 
     fun hasForegroundService(): Boolean = ::foregroundService.isInitialized
 
+    fun requestZeroHeel(now: Long = System.currentTimeMillis()) {
+        zeroHeelPressed = true
+        zeroHeelPressedTime = now
+    }
+
+    fun requestZeroPitch(now: Long = System.currentTimeMillis()) {
+        zeroPitchPressed = true
+        zeroPitchPressedTime = now
+    }
+
+    fun requestZeroBoth(now: Long = System.currentTimeMillis()) {
+        requestZeroHeel(now)
+        requestZeroPitch(now)
+    }
+
+    fun secondsUntilZeroHeel(now: Long = System.currentTimeMillis()): Long =
+        secondsUntilZero(zeroHeelPressedTime, now)
+
+    fun secondsUntilZeroPitch(now: Long = System.currentTimeMillis()): Long =
+        secondsUntilZero(zeroPitchPressedTime, now)
+
+    fun completeZeroHeel() {
+        heelOffset -= heel - extraHeelOffset
+        zeroHeelPressed = false
+        saveZeroOffsets()
+    }
+
+    fun completeZeroPitch() {
+        pitchOffset -= pitch - extraPitchOffset
+        zeroPitchPressed = false
+        saveZeroOffsets()
+    }
+
+    fun resetZeroOffsets() {
+        zeroHeelPressed = false
+        zeroPitchPressed = false
+        heelOffset = 0.0
+        pitchOffset = 0.0
+        saveZeroOffsets()
+    }
+
+    fun saveZeroOffsets() {
+        sharedPref.edit()
+            .putFloat(PITCH_OFFSET, pitchOffset.toFloat())
+            .putFloat(HEEL_OFFSET, heelOffset.toFloat())
+            .apply()
+    }
+
+    private fun secondsUntilZero(pressedTime: Long, now: Long): Long =
+        ((MainActivity.ZEROVALUEDELAY + pressedTime - now) / 1000) + 1
+
     fun savePrefs(){
         sharedPref.edit().putInt(BOAT_NO, boatNo).apply()
         sharedPref.edit().putInt(UPDATE_INTERVAL, updateInterval).apply()
